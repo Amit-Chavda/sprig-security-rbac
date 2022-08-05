@@ -6,7 +6,6 @@ import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,7 +21,7 @@ import java.util.List;
 public class SetupDataLoader implements
         ApplicationListener<ContextRefreshedEvent> {
 
-    private boolean alreadySetup = false;
+   boolean alreadySetup = false;
     private UserRepository userRepository;
     private RoleService roleService;
     private PrivilegeService privilegeService;
@@ -39,7 +38,7 @@ public class SetupDataLoader implements
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (alreadySetup)
+        if (userRepository.existsById(1l))
             return;
         Privilege readPrivilege
                 = createPrivilegeIfNotFound("READ_PRIVILEGE");

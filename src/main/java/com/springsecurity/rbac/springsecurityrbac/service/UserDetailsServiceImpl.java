@@ -3,7 +3,6 @@ package com.springsecurity.rbac.springsecurityrbac.service;
 import com.springsecurity.rbac.springsecurityrbac.entity.Privilege;
 import com.springsecurity.rbac.springsecurityrbac.entity.Role;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
-import com.springsecurity.rbac.springsecurityrbac.entity.UserDetailsImpl;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,6 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         User user = optionalUser.get();
+        System.out.println(user.getPassword() + " : " + user.getEmail());
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

@@ -3,12 +3,19 @@ package com.springsecurity.rbac.springsecurityrbac.controller;
 import com.springsecurity.rbac.springsecurityrbac.entity.JwtUserRequest;
 import com.springsecurity.rbac.springsecurityrbac.service.UserDetailsServiceImpl;
 import com.springsecurity.rbac.springsecurityrbac.util.JwtUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class JwtUserController {
@@ -22,15 +29,25 @@ public class JwtUserController {
     }
 
     @GetMapping("/token")
-    public String generateToken(@ModelAttribute JwtUserRequest jwtRequest) {
+    public ResponseEntity<String> generateToken(@RequestBody JwtUserRequest jwtRequest) {
         JwtUtil jwtUtil = new JwtUtil();
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        jwtRequest.getEmail(),
-                        jwtRequest.getPassword())
-        );
+
+
+        try {
+
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            jwtRequest.getEmail(),
+                            jwtRequest.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (AuthenticationException exception) {
+            return new ResponseEntity<>(exception.toString(), HttpStatus.BAD_REQUEST);
+        }
+
         UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
-        return jwtUtil.generateToken(user);
+        return new ResponseEntity<>(jwtUtil.generateToken(user), HttpStatus.OK);
     }
 
 }

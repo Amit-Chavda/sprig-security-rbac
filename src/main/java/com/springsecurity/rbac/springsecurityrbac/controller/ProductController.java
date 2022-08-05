@@ -4,6 +4,7 @@ import com.springsecurity.rbac.springsecurityrbac.entity.Product;
 import com.springsecurity.rbac.springsecurityrbac.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class ProductController {
     }
 
     @GetMapping("/findAll")
+    @PreAuthorize(value = "")
     public List<Product> findAllProduct() {
         return productService.findAll();
     }
@@ -39,6 +41,7 @@ public class ProductController {
         return productService.saveProduct(product);
     }
 
+    @PreAuthorize("hasRole('DEV')")
     @DeleteMapping("/delete/{id}")
     public String deleteProductByID(@PathVariable long id) {
         productService.removeById(id);
