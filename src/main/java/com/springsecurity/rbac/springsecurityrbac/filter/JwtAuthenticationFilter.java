@@ -2,11 +2,11 @@ package com.springsecurity.rbac.springsecurityrbac.filter;
 
 import com.springsecurity.rbac.springsecurityrbac.service.UserDetailsServiceImpl;
 import com.springsecurity.rbac.springsecurityrbac.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -32,25 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
                 username = jwtUtil.extractUsername(token);
+            } catch (IllegalArgumentException e) {
+                logger.error("An error occurred while getting username from token: {}", e);
+            } catch (ExpiredJwtException e) {
+                logger.warn("The token is expired and not valid anymore: {}", e);
             } catch (Exception exception) {
                 //SignatureException when different secret key is used
                 //JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
-                logger.error(exception.getMessage());
+                logger.error("An error occurred while processing authentication : {}", exception);
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null,
                         userDetails.getAuthorities());
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                logger.info("Authenticated user " + username + ", setting security context!");
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } else {
-                throw new ServletException("Token Expired or Invalid token passed...");
             }
-
         }
         filterChain.doFilter(request, response);
     }

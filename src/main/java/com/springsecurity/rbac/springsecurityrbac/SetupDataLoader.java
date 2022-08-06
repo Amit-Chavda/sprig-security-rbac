@@ -18,10 +18,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
-public class SetupDataLoader implements
-        ApplicationListener<ContextRefreshedEvent> {
-
-   boolean alreadySetup = false;
+public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+    boolean alreadySetup = false;
     private UserRepository userRepository;
     private RoleService roleService;
     private PrivilegeService privilegeService;
@@ -38,34 +36,80 @@ public class SetupDataLoader implements
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (userRepository.existsById(1l))
-            return;
+        if (userRepository.existsById(1L)) return;
+
+        //create privileges
         Privilege readPrivilege
                 = createPrivilegeIfNotFound("READ_PRIVILEGE");
         Privilege writePrivilege
                 = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
+        Privilege updatePrivilege
+                = createPrivilegeIfNotFound("UPDATE_PRIVILEGE");
+        Privilege deletePrivilege
+                = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
 
+        //create privilege groups
         List<Privilege> adminPrivileges = Arrays.asList(
-                readPrivilege, writePrivilege);
-        createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotFound("ROLE_USER", Arrays.asList(readPrivilege));
+                readPrivilege, writePrivilege,
+                updatePrivilege, deletePrivilege
+        );
+        List<Privilege> creatorPrivileges = List.of(readPrivilege, writePrivilege);
+        List<Privilege> editorPrivileges = List.of(readPrivilege, updatePrivilege);
+        List<Privilege> viewerPrivileges = List.of(readPrivilege);
 
-        Role adminRole = roleService.findByName("ROLE_ADMIN");
-        User user = new User();
-        user.setFirstName("Test");
-        user.setLastName("Test");
-        user.setPassword(passwordEncoder.encode("test"));
-        user.setEmail("test@test.com");
-        user.setRoles(Arrays.asList(adminRole));
-        user.setEnabled(true);
-        userRepository.save(user);
+
+        //create admin
+        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
+        User admin = new User();
+        admin.setFirstName("Admin");
+        admin.setLastName("Admin");
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setEmail("admin@test.com");
+        admin.setRoles(Arrays.asList(adminRole));
+        admin.setEnabled(true);
+        userRepository.save(admin);
+
+
+        //create creator
+        Role creatorRole = createRoleIfNotFound("ROLE_CREATOR", creatorPrivileges);
+        User creator = new User();
+        creator.setFirstName("creator");
+        creator.setLastName("creator");
+        creator.setPassword(passwordEncoder.encode("creator"));
+        creator.setEmail("creator@test.com");
+        creator.setRoles(Arrays.asList(creatorRole));
+        creator.setEnabled(true);
+        userRepository.save(creator);
+
+
+        //create editor
+        Role editorRole = createRoleIfNotFound("ROLE_EDITOR", editorPrivileges);
+        User editor = new User();
+        editor.setFirstName("editor");
+        editor.setLastName("editor");
+        editor.setPassword(passwordEncoder.encode("editor"));
+        editor.setEmail("editor@test.com");
+        editor.setRoles(Arrays.asList(editorRole));
+        editor.setEnabled(true);
+        userRepository.save(editor);
+
+
+        //create viewer
+        Role viewerRole = createRoleIfNotFound("ROLE_VIEWER", viewerPrivileges);
+        User viewer = new User();
+        viewer.setFirstName("viewer");
+        viewer.setLastName("viewer");
+        viewer.setPassword(passwordEncoder.encode("viewer"));
+        viewer.setEmail("viewer@test.com");
+        viewer.setRoles(Arrays.asList(viewerRole));
+        viewer.setEnabled(true);
+        userRepository.save(viewer);
 
         alreadySetup = true;
     }
 
     @Transactional
     Privilege createPrivilegeIfNotFound(String name) {
-
         Privilege privilege = privilegeService.findByName(name);
         if (privilege == null) {
             privilege = new Privilege(name);
@@ -75,9 +119,7 @@ public class SetupDataLoader implements
     }
 
     @Transactional
-    Role createRoleIfNotFound(
-            String name, Collection<Privilege> privileges) {
-
+    Role createRoleIfNotFound(String name, Collection<Privilege> privileges) {
         Role role = roleService.findByName(name);
         if (role == null) {
             role = new Role(name);

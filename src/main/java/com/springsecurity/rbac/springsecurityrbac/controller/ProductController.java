@@ -20,29 +20,32 @@ public class ProductController {
     }
 
     @GetMapping("/findAll")
-    @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize(value = "hasAnyRole('ROLE_VIEWER','ROLE_ADMIN','ROLE_EDITOR','ROLE_CREATOR')")
     public List<Product> findAllProduct() {
         return productService.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(value = "hasAnyRole('ROLE_VIEWER','ROLE_ADMIN','ROLE_EDITOR','ROLE_CREATOR')")
     public Product findProductById(@PathVariable Long id) {
         return productService.findById(id);
     }
 
     @PostMapping("/create")
+    @PreAuthorize(value = "hasAnyRole('ROLE_ADMIN','ROLE_CREATOR')")
     public ResponseEntity<Product> createNewProduct(@RequestBody Product product) {
         product = productService.saveProduct(product);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
     @PutMapping("/edit")
+    @PreAuthorize(value = "hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')")
     public Product editProduct(@RequestBody Product product) {
         return productService.saveProduct(product);
     }
 
-    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public String deleteProductByID(@PathVariable long id) {
         productService.removeById(id);
         return "success";
