@@ -31,10 +31,7 @@ public class JwtUserController {
     @GetMapping("/token")
     public ResponseEntity<String> generateToken(@RequestBody JwtUserRequest jwtRequest) {
         JwtUtil jwtUtil = new JwtUtil();
-
-
         try {
-
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             jwtRequest.getEmail(),

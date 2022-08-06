@@ -20,7 +20,7 @@ public class ProductController {
     }
 
     @GetMapping("/findAll")
-    @PreAuthorize(value = "")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public List<Product> findAllProduct() {
         return productService.findAll();
     }
@@ -41,7 +41,7 @@ public class ProductController {
         return productService.saveProduct(product);
     }
 
-    @PreAuthorize("hasRole('DEV')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public String deleteProductByID(@PathVariable long id) {
         productService.removeById(id);
