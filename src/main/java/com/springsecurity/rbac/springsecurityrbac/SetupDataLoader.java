@@ -65,7 +65,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         admin.setLastName("Admin");
         admin.setPassword(passwordEncoder.encode("admin"));
         admin.setEmail("admin@test.com");
-        admin.setRoles(Arrays.asList(adminRole));
+        admin.setRoles(List.of(adminRole));
         admin.setEnabled(true);
         userRepository.save(admin);
 
@@ -77,7 +77,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         creator.setLastName("creator");
         creator.setPassword(passwordEncoder.encode("creator"));
         creator.setEmail("creator@test.com");
-        creator.setRoles(Arrays.asList(creatorRole));
+        creator.setRoles(List.of(creatorRole));
         creator.setEnabled(true);
         userRepository.save(creator);
 
@@ -89,7 +89,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         editor.setLastName("editor");
         editor.setPassword(passwordEncoder.encode("editor"));
         editor.setEmail("editor@test.com");
-        editor.setRoles(Arrays.asList(editorRole));
+        editor.setRoles(List.of(editorRole));
         editor.setEnabled(true);
         userRepository.save(editor);
 
@@ -101,7 +101,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         viewer.setLastName("viewer");
         viewer.setPassword(passwordEncoder.encode("viewer"));
         viewer.setEmail("viewer@test.com");
-        viewer.setRoles(Arrays.asList(viewerRole));
+        viewer.setRoles(List.of(viewerRole));
         viewer.setEnabled(true);
         userRepository.save(viewer);
 

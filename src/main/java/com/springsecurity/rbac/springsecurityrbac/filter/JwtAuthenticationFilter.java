@@ -42,8 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 logger.error("An error occurred while processing authentication : {}", exception);
             }
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null,
                         userDetails.getAuthorities());
