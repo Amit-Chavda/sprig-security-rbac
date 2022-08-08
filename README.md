@@ -1,5 +1,5 @@
 # sprig-security-rbac
-Demonstration of role based authentication and authorization using using security
+Demonstration of role based authentication and authorization using spring security and jwt
 
 ### Database
 ![RBAC drawio](https://user-images.githubusercontent.com/47694676/183420771-756b6fc3-100f-48e3-8153-1e3f8e53987b.png)
