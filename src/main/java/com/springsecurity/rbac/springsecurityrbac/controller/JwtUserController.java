@@ -31,17 +31,15 @@ public class JwtUserController {
     @GetMapping("/token")
     public ResponseEntity<String> generateToken(@RequestBody JwtUserRequest jwtRequest) {
         JwtUtil jwtUtil = new JwtUtil();
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            jwtRequest.getEmail(),
-                            jwtRequest.getPassword()
-                    )
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (AuthenticationException exception) {
-            return new ResponseEntity<>(exception.toString(), HttpStatus.BAD_REQUEST);
-        }
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        jwtRequest.getEmail(),
+                        jwtRequest.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
         return new ResponseEntity<>(jwtUtil.generateToken(user), HttpStatus.OK);
