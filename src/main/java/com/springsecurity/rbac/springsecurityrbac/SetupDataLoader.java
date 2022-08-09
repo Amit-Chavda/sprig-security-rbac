@@ -1,11 +1,16 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.PagesPrivileges;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.repository.PagesPrivilegesRepository;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
+import com.springsecurity.rbac.springsecurityrbac.service.PageService;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,17 +18,122 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+
+    boolean alreadySetup = false;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private UserRepository userRepository;
+    private RoleService roleService;
+    private PrivilegeService privilegeService;
+    private PageService pageService;
+
+    @Autowired
+    private PagesPrivilegesRepository pagesPrivilegesRepository;
+
+    public SetupDataLoader(UserRepository userRepository, RoleService roleService, PrivilegeService privilegeService, PageService pageService) {
+        this.userRepository = userRepository;
+        this.roleService = roleService;
+        this.privilegeService = privilegeService;
+        this.pageService = pageService;
+    }
+
     @Override
+    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
+        Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
+        Privilege createPrivilege = createPrivilegeIfNotFound("CREATE_PRIVILEGE");
+        Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
+        Privilege updatePrivilege = createPrivilegeIfNotFound("UPDATE_PRIVILEGE");
+        Privilege deletePrivilege = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
+
+        //create page
+        Page homePage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.HOME);
+        Page productPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.PRODUCT);
+        Page orderPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.ORDER);
+
+
+        //setup PagesPrivileges
+        PagesPrivileges pagesPrivileges = new PagesPrivileges();
+        pagesPrivileges.setPrivilege(readPrivilege);
+        pagesPrivileges.setPage(productPage);
+
+        List<Page> pageList = pageService.findAll();
+        List<Privilege> privilegeList = privilegeService.findAll();
+
+
+
+        /*pageList.forEach(page -> {
+            PagesPrivileges privileges = new PagesPrivileges();
+            privileges.setPage(page);
+            privilegeList.forEach(privilege -> {
+                privileges.setPrivilege(privilege);
+                privileges = pagesPrivilegesRepository.save(pagesPrivileges);
+            });
+            Role adminRole = createRoleIfNotFound("ROLE_ADMIN", List.of(pagesPrivileges));
+        });
+
+
+        PagesPrivileges pagesPrivileges1 = pagesPrivilegesRepository.save(pagesPrivileges);
+
+        //create admin
+
+        adminRole.setPagesPrivileges(new ArrayList<>(List.of(pagesPrivileges1)));
+
+        adminRole = roleService.save(adminRole);
+
+        User admin = new User();
+        admin.setFirstName("Admin");
+        admin.setLastName("Admin");
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setEmail("admin@test.com");
+        admin.setRoles(List.of(adminRole));
+        admin.setEnabled(true);
+        admin.setRoles(List.of(adminRole));
+
+        userRepository.save(admin);*/
+
     }
-/*    boolean alreadySetup = false;
+
+    @Transactional
+    Page createPageIfNotFound(String name) {
+        Page page = pageService.findByName(name);
+        if (page == null) {
+            page = new Page(name);
+            pageService.save(page);
+        }
+        return page;
+    }
+
+    @Transactional
+    Privilege createPrivilegeIfNotFound(String name) {
+        Privilege privilege = privilegeService.findByName(name);
+        if (privilege == null) {
+            privilege = new Privilege(name);
+            privilegeService.save(privilege);
+        }
+        return privilege;
+    }
+
+    @Transactional
+    Role createRoleIfNotFound(String name, Collection<PagesPrivileges> pagesPrivileges) {
+        Role role = roleService.findByName(name);
+        if (role == null) {
+            role = new Role(name);
+            role.setPagesPrivileges(pagesPrivileges);
+            roleService.save(role);
+        }
+        return role;
+    }
+
+    /*    boolean alreadySetup = false;
     private UserRepository userRepository;
     private RoleService roleService;
     private PrivilegeService privilegeService;

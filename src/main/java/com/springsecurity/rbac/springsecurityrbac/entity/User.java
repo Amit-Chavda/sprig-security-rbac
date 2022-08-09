@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Entity
@@ -28,5 +29,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+  /*  public void setRoles(Collection<Role> roles) {
+        for (Role role : roles) {
+            role.setUsers(List.of(this));
+        }
+        this.roles = roles;
+    }*/
 }
 

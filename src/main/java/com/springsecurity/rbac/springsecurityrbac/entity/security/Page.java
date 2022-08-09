@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Data
@@ -19,16 +21,30 @@ public class Page {
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "pages_privileges",
-            joinColumns = @JoinColumn(
-                    name = "page_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "privilege_id", referencedColumnName = "id"))
-    private Collection<Privilege> privileges;
+    /* @ManyToMany(fetch = FetchType.EAGER)
+     @JoinTable(
+             name = "pages_privileges",
+             joinColumns = @JoinColumn(
+                     name = "page_id", referencedColumnName = "id"),
+             inverseJoinColumns = @JoinColumn(
+                     name = "privilege_id", referencedColumnName = "id"))
+     private Collection<Privilege> privileges;
 
-    @ManyToMany(mappedBy = "pages")
-    private Collection<Role> roles;
+     @ManyToMany(mappedBy = "pages")
+     private Collection<Role> roles;
+ */
+    // @JsonIgnore
+    @OneToMany(mappedBy = "page", cascade = CascadeType.ALL)
+    private Collection<PagesPrivileges> pagesPrivileges;
 
+    public Page(String name) {
+        this.name = name;
+    }
+
+    public void setPagesPrivileges(Collection<PagesPrivileges> pagesPrivileges) {
+        for (PagesPrivileges privileges : pagesPrivileges) {
+            privileges.setPage(this);
+        }
+        this.pagesPrivileges = pagesPrivileges;
+    }
 }

@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+
 @Service
 public class PrivilegeService {
     private Logger logger = LoggerFactory.getLogger(PrivilegeService.class);
@@ -29,5 +31,9 @@ public class PrivilegeService {
 
     public Privilege save(Privilege privilege) {
         return privilegeRepository.save(privilege);
+    }
+
+    public List<Privilege> findAll() {
+        return privilegeRepository.findAll();
     }
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,5 +30,9 @@ public class PageService {
 
     public Page save(Page page) {
         return pageRepository.save(page);
+    }
+
+    public List<Page> findAll() {
+        return pageRepository.findAll();
     }
 }

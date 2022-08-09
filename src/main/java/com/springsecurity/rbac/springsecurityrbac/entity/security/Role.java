@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Entity
@@ -22,14 +23,25 @@ public class Role {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "roles_pages",
+            name = "pages_privileges_roles",
             joinColumns = @JoinColumn(
-                    name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "page_id", referencedColumnName = "id"))
-    private Collection<Page> pages;
+                    name = "pages_privileges_id",
+                    referencedColumnName = "id"
+            ), inverseJoinColumns = @JoinColumn(
+            name = "role_id",
+            referencedColumnName = "id")
+    )
+    private Collection<PagesPrivileges> pagesPrivileges;
 
     public Role(String name) {
         this.name = name;
+    }
+
+    public void setPagesPrivileges(Collection<PagesPrivileges> pagesPrivileges) {
+        for (PagesPrivileges privileges : pagesPrivileges) {
+            privileges.setRoles(List.of(this));
+        }
+
+        this.pagesPrivileges = pagesPrivileges;
     }
 }
