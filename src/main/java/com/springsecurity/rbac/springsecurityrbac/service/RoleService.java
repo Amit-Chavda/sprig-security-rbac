@@ -1,6 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

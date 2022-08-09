@@ -1,5 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.entity;
 
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import lombok.Data;
 
 import javax.persistence.*;

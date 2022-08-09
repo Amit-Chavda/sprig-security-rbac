@@ -1,4 +1,4 @@
-package com.springsecurity.rbac.springsecurityrbac.entity;
+package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,9 +16,10 @@ public class Privilege {
     private String name;
 
     @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    private Collection<Role> roles;
+    private Collection<Page> pages;
 
     public Privilege(String name) {
         this.name = name;
     }
+
 }

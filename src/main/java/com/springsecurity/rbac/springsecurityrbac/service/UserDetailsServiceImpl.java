@@ -1,7 +1,7 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.Privilege;
-import com.springsecurity.rbac.springsecurityrbac.entity.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,10 +39,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 true,
                 true,
                 true,
-                getAuthorities(user.getRoles())
+                null//etAuthorities(user.getRoles())
         );
     }
-
+/*
     private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
         return getGrantedAuthorities(getPrivileges(roles));
     }
@@ -68,5 +68,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(privilege));
         }
         return authorities;
-    }
+    }*/
 }

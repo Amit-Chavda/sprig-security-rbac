@@ -1,6 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
 import com.springsecurity.rbac.springsecurityrbac.repository.PrivilegeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,12 +1,12 @@
 package com.springsecurity.rbac.springsecurityrbac.repository;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role,Long> {
-    Optional<Role> findByName(String name);
+public interface PageRepository extends JpaRepository<Page, Long> {
+    Optional<Page> findByName(String name);
 }

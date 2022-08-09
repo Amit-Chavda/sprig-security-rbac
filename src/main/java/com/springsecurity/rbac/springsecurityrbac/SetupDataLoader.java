@@ -1,7 +1,7 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.Privilege;
-import com.springsecurity.rbac.springsecurityrbac.entity.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
@@ -19,7 +19,11 @@ import java.util.List;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    boolean alreadySetup = false;
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
+    }
+/*    boolean alreadySetup = false;
     private UserRepository userRepository;
     private RoleService roleService;
     private PrivilegeService privilegeService;
@@ -127,5 +131,5 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             roleService.save(role);
         }
         return role;
-    }
+    }*/
 }

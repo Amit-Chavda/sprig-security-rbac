@@ -1,6 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.repository;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
