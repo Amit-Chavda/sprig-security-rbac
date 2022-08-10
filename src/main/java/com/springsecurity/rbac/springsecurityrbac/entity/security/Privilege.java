@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Set;
 
 @Entity
@@ -15,10 +14,6 @@ public class Privilege {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
-
-   /* @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    private Collection<Page> pages;*/
-
     @OneToMany(mappedBy = "privilege", cascade = CascadeType.ALL)
     private Set<PagesPrivileges> pagesPrivileges;
 

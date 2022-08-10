@@ -1,5 +1,10 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
+import com.springsecurity.rbac.springsecurityrbac.dto.PageDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.PrivilegeDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
+import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE;
+import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PRIVILEGE;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.PagesPrivileges;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
@@ -10,6 +15,9 @@ import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.PageService;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
+import com.springsecurity.rbac.springsecurityrbac.util.PageUtil;
+import com.springsecurity.rbac.springsecurityrbac.util.PrivilegeUtil;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -28,6 +36,8 @@ import java.util.stream.Collectors;
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     boolean alreadySetup = false;
+    ModelMapper mapper = new ModelMapper();
+
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private UserRepository userRepository;
     private RoleService roleService;
@@ -48,26 +58,82 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
+      /*  Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
         Privilege createPrivilege = createPrivilegeIfNotFound("CREATE_PRIVILEGE");
         Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
         Privilege updatePrivilege = createPrivilegeIfNotFound("UPDATE_PRIVILEGE");
-        Privilege deletePrivilege = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
+        Privilege deletePrivilege = createPrivilegeIfNotFound("DELETE_PRIVILEGE");*/
 
         //create page
-        Page homePage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.HOME);
-        Page productPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.PRODUCT);
-        Page orderPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.Page.ORDER);
+        Page homePage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.HOME);
+        Page productPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.PRODUCT);
+        Page orderPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.ORDER);
 
 
-        //setup PagesPrivileges
-        PagesPrivileges pagesPrivileges = new PagesPrivileges();
-        pagesPrivileges.setPrivilege(readPrivilege);
-        pagesPrivileges.setPage(productPage);
+        RoleDto roleDto = new RoleDto();
 
-        List<Page> pageList = pageService.findAll();
-        List<Privilege> privilegeList = privilegeService.findAll();
+        Page page = createPageIfNotFound(PAGE.HOME);
+        Privilege privilege = createPrivilegeIfNotFound(PRIVILEGE.READ);
 
+
+        PagesPrivileges privileges = new PagesPrivileges();
+
+
+
+
+        roleDto.setPages(
+                Arrays.asList(
+                        //page
+
+
+                        new Page(
+                                //page name
+                                PAGE.HOME,
+                                //allowed privileges
+                                Arrays.asList(
+                                        createPrivilegeIfNotFound(PRIVILEGE.READ),
+                                        createPrivilegeIfNotFound(PRIVILEGE.WRITE),
+                                        createPrivilegeIfNotFound(PRIVILEGE.DELETE),
+                                        createPrivilegeIfNotFound(PRIVILEGE.UPDATE),
+                                        createPrivilegeIfNotFound(PRIVILEGE.CREATE)
+                                )
+                        ),
+                        new Page(
+                                //page name
+                                PAGE.HOME,
+                                //allowed privileges
+                                Arrays.asList(
+                                        createPrivilegeIfNotFound(PRIVILEGE.READ),
+                                        createPrivilegeIfNotFound(PRIVILEGE.READ),
+                                        createPrivilegeIfNotFound(PRIVILEGE.READ),
+                                        createPrivilegeIfNotFound(PRIVILEGE.READ)
+                                )
+                        )
+                )
+        );
+
+
+
+        Role role = new Role("My Role");
+
+
+        List<PagesPrivileges> pagesPrivilegesList = new ArrayList<>();
+
+        //set page
+        for (PageDto pageDto : roleDto.getPageDtos()) {
+            PagesPrivileges pagesPrivileges = new PagesPrivileges();
+            pagesPrivileges.setPage(PageUtil.toPage(pageDto));
+
+            //set each privilege and save
+            for (Privilege privilege : pageDto.getPrivileges()) {
+                //set privilege
+                pagesPrivileges.setPrivilege(privilege);
+                PagesPrivileges pagesPrivilegesSaved = pagesPrivilegesRepository.save(pagesPrivileges);
+                pagesPrivilegesList.add(pagesPrivilegesSaved);
+            }
+        }
+
+        role = createRoleIfNotFound(role.getName(), pagesPrivilegesList);
 
 
         /*pageList.forEach(page -> {

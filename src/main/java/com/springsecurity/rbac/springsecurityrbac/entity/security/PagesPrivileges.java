@@ -19,7 +19,7 @@ public class PagesPrivileges {
     private Page page;
 
 
-    @ManyToMany(targetEntity = Privilege.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Privilege.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "privilege_id", referencedColumnName = "id")
     private Privilege privilege;
 
