@@ -31,9 +31,7 @@ public class UserController {
 
     private RolePagesPrivilegesService rolePagesPrivilegesService;
 
-    public UserController(PageService pageService, PrivilegeService privilegeService, UserService userService,
-                          PageRepository pageRepository, PagesPrivilegesService pagesPrivilegesService,
-                          RoleService roleService, RolePagesPrivilegesService rolePagesPrivilegesService) {
+    public UserController(PageService pageService, PrivilegeService privilegeService, UserService userService, PageRepository pageRepository, PagesPrivilegesService pagesPrivilegesService, RoleService roleService, RolePagesPrivilegesService rolePagesPrivilegesService) {
         this.pageService = pageService;
         this.privilegeService = privilegeService;
         this.userService = userService;
@@ -44,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public User createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@RequestBody UserDto userDto) {
 
         User user = new User();
         user.setEmail(userDto.getEmail());
@@ -86,8 +84,11 @@ public class UserController {
             }
         });
 
+        //set roles
         user.setRoles(roleHashSet);
-        return userService.save(user);
+        //save users
+        userService.save(user);
+        return userDto;
     }
 
 
