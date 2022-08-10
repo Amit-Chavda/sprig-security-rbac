@@ -1,12 +1,8 @@
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-    type:
-      descriptor:
-        sql:
-          BasicBinder: TRACE
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: DEBUG
 server:
   port: 9095
 spring:

@@ -3,8 +3,8 @@ package com.springsecurity.rbac.springsecurityrbac;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.repository.PagesPrivilegesRepository;
 import com.springsecurity.rbac.springsecurityrbac.repository.RolePagesPrivilegesRepository;
-import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.PageService;
+import com.springsecurity.rbac.springsecurityrbac.service.PagesPrivilegesService;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,15 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private RoleService roleService;
     private PrivilegeService privilegeService;
+
+    @Autowired
+    private PagesPrivilegesService pagesPrivilegesService;
     private PageService pageService;
 
     private RolePagesPrivilegesRepository rolePagesPrivilegesRepository;
@@ -60,14 +64,21 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 PagesPrivileges pagesPrivileges = new PagesPrivileges();
                 pagesPrivileges.setPage(page);
                 pagesPrivileges.setPrivilege(privilege);
-                pagesPrivilegesList.add(pagesPrivilegesRepository.save(pagesPrivileges));
+
+                Optional<PagesPrivileges> pagesPrivilegesOptional = pagesPrivilegesService.alreadyExists(pagesPrivileges);
+
+                if (pagesPrivilegesOptional.isPresent()) {
+                    pagesPrivilegesList.add(pagesPrivilegesOptional.get());
+                } else {
+                    pagesPrivilegesList.add(pagesPrivilegesRepository.save(pagesPrivileges));
+                }
             }
         }
 
         for (PagesPrivileges pagesPrivileges : pagesPrivilegesList) {
             RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
             rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
-            rolePagesPrivileges.setRole(createRoleIfNotFound("ADMIN"));
+            rolePagesPrivileges.setRole(createRoleIfNotFound("ADMIN2"));
             rolePagesPrivilegesRepository.save(rolePagesPrivileges);
         }
 

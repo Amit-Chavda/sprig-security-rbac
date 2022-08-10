@@ -17,17 +17,10 @@ public class Page {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
-    @OneToMany(mappedBy = "page", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "page", cascade = {CascadeType.MERGE})
     private Collection<PagesPrivileges> pagesPrivileges;
 
     public Page(String name) {
         this.name = name;
-    }
-
-    public void setPagesPrivileges(Collection<PagesPrivileges> pagesPrivileges) {
-        for (PagesPrivileges privileges : pagesPrivileges) {
-            privileges.setPage(this);
-        }
-        this.pagesPrivileges = pagesPrivileges;
     }
 }

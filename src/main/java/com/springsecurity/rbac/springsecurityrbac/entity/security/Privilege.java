@@ -14,17 +14,10 @@ public class Privilege {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
-    @OneToMany(mappedBy = "privilege", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "privilege", cascade = {CascadeType.MERGE})
     private Set<PagesPrivileges> pagesPrivileges;
 
     public Privilege(String name) {
         this.name = name;
-    }
-
-    public void setPagesPrivileges(Set<PagesPrivileges> pagesPrivileges) {
-        for (PagesPrivileges privileges : pagesPrivileges) {
-            privileges.setPrivilege(this);
-        }
-        this.pagesPrivileges = pagesPrivileges;
     }
 }
