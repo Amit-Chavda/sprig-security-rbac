@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Entity
@@ -26,8 +27,4 @@ public class PagesPrivileges {
 
     @ManyToMany(mappedBy = "pagesPrivileges", fetch = FetchType.EAGER)
     private Collection<Role> roles;
-
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles;
-    }
 }

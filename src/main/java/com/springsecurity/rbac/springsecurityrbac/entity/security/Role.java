@@ -37,11 +37,4 @@ public class Role {
         this.name = name;
     }
 
-    public void setPagesPrivileges(Collection<PagesPrivileges> pagesPrivileges) {
-        for (PagesPrivileges privileges : pagesPrivileges) {
-            privileges.setRoles(List.of(this));
-        }
-
-        this.pagesPrivileges = pagesPrivileges;
-    }
 }

@@ -30,6 +30,4 @@ public class Page {
         }
         this.pagesPrivileges = pagesPrivileges;
     }
-
-
 }
