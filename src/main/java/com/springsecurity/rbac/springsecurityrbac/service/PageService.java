@@ -19,17 +19,13 @@ public class PageService {
         this.pageRepository = pageRepository;
     }
 
-    public Page findByName(String name) {
-        Optional<Page> page = pageRepository.findByName(name);
-        if (page.isEmpty()) {
-            logger.info("Page with name {} not found!", name);
-            return null;
-        }
-        return page.get();
+    public Optional<Page> findByName(String name) {
+        return pageRepository.findByName(name);
     }
 
     public Page save(Page page) {
-        return pageRepository.save(page);
+        Optional<Page> optionalPage = findByName(page.getName());
+        return optionalPage.orElseGet(() -> pageRepository.save(page));
     }
 
     public List<Page> findAll() {

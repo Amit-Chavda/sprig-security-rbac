@@ -9,6 +9,10 @@ public class RolePagesPrivilegesService {
 
     private RolePagesPrivilegesRepository rolePagesPrivilegesRepository;
 
+    public RolePagesPrivilegesService(RolePagesPrivilegesRepository rolePagesPrivilegesRepository) {
+        this.rolePagesPrivilegesRepository = rolePagesPrivilegesRepository;
+    }
+
     public RolePagesPrivileges save(RolePagesPrivileges rolePagesPrivileges) {
         return rolePagesPrivilegesRepository.save(rolePagesPrivileges);
     }

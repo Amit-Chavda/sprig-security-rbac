@@ -4,10 +4,7 @@ import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.repository.PageRepository;
-import com.springsecurity.rbac.springsecurityrbac.service.PagesPrivilegesService;
-import com.springsecurity.rbac.springsecurityrbac.service.RolePagesPrivilegesService;
-import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
-import com.springsecurity.rbac.springsecurityrbac.service.UserService;
+import com.springsecurity.rbac.springsecurityrbac.service.*;
 import com.springsecurity.rbac.springsecurityrbac.util.PrivilegeUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +20,9 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController {
 
+
+    private PageService pageService;
+    private PrivilegeService privilegeService;
     private UserService userService;
     private PageRepository pageRepository;
     private PagesPrivilegesService pagesPrivilegesService;
@@ -31,8 +31,11 @@ public class UserController {
 
     private RolePagesPrivilegesService rolePagesPrivilegesService;
 
-    public UserController(UserService userService, PageRepository pageRepository, PagesPrivilegesService pagesPrivilegesService,
+    public UserController(PageService pageService, PrivilegeService privilegeService, UserService userService,
+                          PageRepository pageRepository, PagesPrivilegesService pagesPrivilegesService,
                           RoleService roleService, RolePagesPrivilegesService rolePagesPrivilegesService) {
+        this.pageService = pageService;
+        this.privilegeService = privilegeService;
         this.userService = userService;
         this.pageRepository = pageRepository;
         this.pagesPrivilegesService = pagesPrivilegesService;
@@ -62,8 +65,8 @@ public class UserController {
         for (Page page : pages) {
             for (Privilege privilege : page.getPrivileges()) {
                 PagesPrivileges pagesPrivileges = new PagesPrivileges();
-                pagesPrivileges.setPage(page);
-                pagesPrivileges.setPrivilege(privilege);
+                pagesPrivileges.setPage(pageService.save(page));
+                pagesPrivileges.setPrivilege(privilegeService.save(privilege));
                 pagesPrivilegesList.add(pagesPrivilegesService.save(pagesPrivileges));
             }
         }

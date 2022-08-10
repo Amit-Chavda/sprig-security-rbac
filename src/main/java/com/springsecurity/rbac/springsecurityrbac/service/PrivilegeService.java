@@ -19,18 +19,14 @@ public class PrivilegeService {
         this.privilegeRepository = privilegeRepository;
     }
 
-    public Privilege findByName(String name) {
-        Optional<Privilege> privilege = privilegeRepository.findByName(name);
-        if (privilege.isEmpty()) {
-            logger.info("Privilege with name {} not found!", name);
-            return null;
-        }
-        return privilege.get();
+    public Optional<Privilege> findByName(String name) {
+        return privilegeRepository.findByName(name);
     }
 
 
     public Privilege save(Privilege privilege) {
-        return privilegeRepository.save(privilege);
+        Optional<Privilege> privilegeOptional = findByName(privilege.getName());
+        return privilegeOptional.orElseGet(() -> privilegeRepository.save(privilege));
     }
 
     public List<Privilege> findAll() {

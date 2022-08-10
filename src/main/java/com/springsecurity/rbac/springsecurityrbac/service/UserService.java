@@ -18,7 +18,8 @@ public class UserService {
     }
 
     public User save(User user) {
-        return userRepository.save(user);
+        Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
+        return optionalUser.orElseGet(() -> userRepository.save(user));
     }
 
     public User findById(long id) throws UsernameNotFoundException {

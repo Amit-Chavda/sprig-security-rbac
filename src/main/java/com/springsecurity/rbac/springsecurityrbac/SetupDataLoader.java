@@ -2,8 +2,8 @@ package com.springsecurity.rbac.springsecurityrbac;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE;
+import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PRIVILEGE;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
-import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.*;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -21,18 +21,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private PrivilegeService privilegeService;
 
     private PagesPrivilegesService pagesPrivilegesService;
-    private UserRepository userRepository;
+    private UserService userService;
     private PageService pageService;
 
     private RolePagesPrivilegesService rolePagesPrivilegesService;
 
     public SetupDataLoader(RoleService roleService, PrivilegeService privilegeService,
-                           PagesPrivilegesService pagesPrivilegesService, UserRepository userRepository,
-                           PageService pageService, RolePagesPrivilegesService rolePagesPrivilegesService) {
+                           PagesPrivilegesService pagesPrivilegesService,
+                           UserService userService, PageService pageService, RolePagesPrivilegesService rolePagesPrivilegesService) {
         this.roleService = roleService;
         this.privilegeService = privilegeService;
         this.pagesPrivilegesService = pagesPrivilegesService;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.pageService = pageService;
         this.rolePagesPrivilegesService = rolePagesPrivilegesService;
     }
@@ -44,19 +44,20 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
-        Privilege createPrivilege = createPrivilegeIfNotFound("CREATE_PRIVILEGE");
-        Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
-        Privilege updatePrivilege = createPrivilegeIfNotFound("UPDATE_PRIVILEGE");
-        Privilege deletePrivilege = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
+        //setup default privileges
+        privilegeService.save(new Privilege(PRIVILEGE.CREATE));
+        privilegeService.save(new Privilege(PRIVILEGE.READ));
+        privilegeService.save(new Privilege(PRIVILEGE.WRITE));
+        privilegeService.save(new Privilege(PRIVILEGE.UPDATE));
+        privilegeService.save(new Privilege(PRIVILEGE.DELETE));
 
-        //create page
-        Page homePage = createPageIfNotFound(PAGE.HOME);
-        Page productPage = createPageIfNotFound(PAGE.PRODUCT);
-        Page orderPage = createPageIfNotFound(PAGE.ORDER);
-        Page summaryPage = createPageIfNotFound(PAGE.SUMMARY);
+        pageService.save(new Page(PAGE.HOME));
+        pageService.save(new Page(PAGE.SUMMARY));
+        pageService.save(new Page(PAGE.ORDER));
+        pageService.save(new Page(PAGE.PRODUCT));
 
 
+        //prepare all privileges for root user
         List<Page> pageList = pageService.findAll();
         List<Privilege> privilegeList = privilegeService.findAll();
 
@@ -70,6 +71,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 pagesPrivilegesList.add(pagesPrivilegesService.save(pagesPrivileges));
             }
         }
+        //root admin role
         Role adminRole = new Role("ADMIN");
         adminRole = roleService.save(adminRole);
 
@@ -80,6 +82,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             rolePagesPrivilegesService.save(rolePagesPrivileges);
         }
 
+        //setup default root admin
         User admin = new User();
         admin.setFirstName("Admin");
         admin.setLastName("Admin");
@@ -87,26 +90,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         admin.setEmail("admin@test.com");
         admin.setRoles(List.of(adminRole));
         admin.setEnabled(true);
-        userRepository.save(admin);
-    }
-
-    @Transactional
-    Page createPageIfNotFound(String name) {
-        Page page = pageService.findByName(name);
-        if (page == null) {
-            page = new Page(name);
-            pageService.save(page);
-        }
-        return page;
-    }
-
-    @Transactional
-    Privilege createPrivilegeIfNotFound(String name) {
-        Privilege privilege = privilegeService.findByName(name);
-        if (privilege == null) {
-            privilege = new Privilege(name);
-            privilegeService.save(privilege);
-        }
-        return privilege;
+        userService.save(admin);
     }
 }
