@@ -1,10 +1,8 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.PagesPrivileges;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.repository.PagesPrivilegesRepository;
+import com.springsecurity.rbac.springsecurityrbac.repository.RolePagesPrivilegesRepository;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.service.PageService;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
@@ -21,19 +19,19 @@ import java.util.List;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    private UserRepository userRepository;
     private RoleService roleService;
     private PrivilegeService privilegeService;
     private PageService pageService;
 
-    @Autowired
+    private RolePagesPrivilegesRepository rolePagesPrivilegesRepository;
     private PagesPrivilegesRepository pagesPrivilegesRepository;
 
-    public SetupDataLoader(UserRepository userRepository, RoleService roleService, PrivilegeService privilegeService, PageService pageService) {
-        this.userRepository = userRepository;
+    public SetupDataLoader(RoleService roleService, PrivilegeService privilegeService, PageService pageService, RolePagesPrivilegesRepository rolePagesPrivilegesRepository, PagesPrivilegesRepository pagesPrivilegesRepository) {
         this.roleService = roleService;
         this.privilegeService = privilegeService;
         this.pageService = pageService;
+        this.rolePagesPrivilegesRepository = rolePagesPrivilegesRepository;
+        this.pagesPrivilegesRepository = pagesPrivilegesRepository;
     }
 
     @Override
@@ -66,6 +64,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             }
         }
 
+        for (PagesPrivileges pagesPrivileges : pagesPrivilegesList) {
+            RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
+            rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
+            rolePagesPrivileges.setRole(createRoleIfNotFound("ADMIN"));
+            rolePagesPrivilegesRepository.save(rolePagesPrivileges);
+        }
+
 
     }
 
@@ -94,7 +99,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Role role = roleService.findByName(name);
         if (role == null) {
             role = new Role(name);
-            role.setPagesPrivileges(pagesPrivileges);
+//            role.setPagesPrivileges(pagesPrivileges);
             roleService.save(role);
         }
         return role;

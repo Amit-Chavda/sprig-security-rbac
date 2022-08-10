@@ -10,6 +10,9 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
+@Table(uniqueConstraints={
+        @UniqueConstraint(columnNames = {"privilege_id", "page_id"})
+})
 public class PagesPrivileges {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +28,8 @@ public class PagesPrivileges {
     private Privilege privilege;
 
 
-    @ManyToMany(mappedBy = "pagesPrivileges", fetch = FetchType.EAGER)
-    private Collection<Role> roles;
+    @OneToMany(mappedBy = "pagesPrivileges", cascade = CascadeType.ALL)
+    private Collection<RolePagesPrivileges> rolePagesPrivileges;
+
+
 }

@@ -21,17 +21,17 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "pages_privileges_roles",
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "role")
+    /*@JoinTable(name = "pages_privileges_roles",
             joinColumns = @JoinColumn(
                     name = "pages_privileges_id",
                     referencedColumnName = "id"
-            ), inverseJoinColumns = @JoinColumn(
-            name = "role_id",
-            referencedColumnName = "id")
-    )
-    private Collection<PagesPrivileges> pagesPrivileges;
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id",
+                    referencedColumnName = "id")
+    )*/
+    private Collection<RolePagesPrivileges> rolePagesPrivileges;
 
     public Role(String name) {
         this.name = name;
