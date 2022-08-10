@@ -1,7 +1,9 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -10,6 +12,8 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Table(uniqueConstraints={
         @UniqueConstraint(columnNames = {"privilege_id", "page_id"})
 })
@@ -30,6 +34,5 @@ public class PagesPrivileges {
 
     @OneToMany(mappedBy = "pagesPrivileges", cascade = CascadeType.ALL)
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
-
 
 }

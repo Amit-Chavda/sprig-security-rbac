@@ -12,5 +12,5 @@ import java.util.Collection;
 @AllArgsConstructor
 public class PageDto {
     private String name;
-    private Collection<Privilege> privileges;
+    private Collection<PrivilegeDto> privileges;
 }

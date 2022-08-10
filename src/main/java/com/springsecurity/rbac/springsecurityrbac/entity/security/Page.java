@@ -3,6 +3,7 @@ package com.springsecurity.rbac.springsecurityrbac.entity.security;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Page {
 
     @Id
@@ -22,5 +24,18 @@ public class Page {
 
     public Page(String name) {
         this.name = name;
+    }
+
+
+    private transient Collection<Privilege> privileges;
+
+    @Transient
+    public void setPrivileges(Collection<Privilege> privileges) {
+        this.privileges = privileges;
+    }
+
+    @Transient
+    public Collection<Privilege> getPrivileges() {
+        return privileges;
     }
 }

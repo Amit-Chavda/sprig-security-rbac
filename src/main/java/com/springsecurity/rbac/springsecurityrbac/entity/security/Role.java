@@ -1,16 +1,19 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Role {
 
     @Id
@@ -21,16 +24,7 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "role")
-    /*@JoinTable(name = "pages_privileges_roles",
-            joinColumns = @JoinColumn(
-                    name = "pages_privileges_id",
-                    referencedColumnName = "id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "role_id",
-                    referencedColumnName = "id")
-    )*/
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "role")
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 
     public Role(String name) {

@@ -25,23 +25,13 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public Role findByName(String name) {
-        Optional<Role> role = roleRepository.findByName(name);
-        if (role.isEmpty()) {
-            logger.info("Role with name {} not found!", name);
-            return null;
-        }
-        return role.get();
+    public Optional<Role> findByName(String name) {
+        return roleRepository.findByName(name);
     }
 
     public Role save(Role role) {
-        return roleRepository.save(role);
+        Optional<Role> optionalRole = findByName(role.getName());
+        return optionalRole.orElseGet(() -> roleRepository.save(role));
     }
-
-    public void save(RoleDto roleDto) {
-
-
-    }
-
 
 }

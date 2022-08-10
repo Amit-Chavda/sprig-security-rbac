@@ -17,11 +17,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    private User save(User user) {
+    public User save(User user) {
         return userRepository.save(user);
     }
 
-    private User findById(long id) throws UsernameNotFoundException {
+    public User findById(long id) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findById(id);
 
         if (Optional.of(user).isEmpty()) {
@@ -30,11 +30,11 @@ public class UserService {
         return user.get();
     }
 
-    private List<User> findAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    private void removeById(long id) {
+    public void removeById(long id) {
         userRepository.deleteById(id);
     }
 

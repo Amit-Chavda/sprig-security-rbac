@@ -1,13 +1,17 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class RolePagesPrivileges {
 
     @Id

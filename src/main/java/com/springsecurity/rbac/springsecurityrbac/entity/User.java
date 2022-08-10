@@ -1,14 +1,19 @@
 package com.springsecurity.rbac.springsecurityrbac.entity;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class User {
 
     @Id
@@ -30,11 +35,5 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
-  /*  public void setRoles(Collection<Role> roles) {
-        for (Role role : roles) {
-            role.setUsers(List.of(this));
-        }
-        this.roles = roles;
-    }*/
 }
 

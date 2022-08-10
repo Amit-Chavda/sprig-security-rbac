@@ -12,5 +12,5 @@ import java.util.Collection;
 @AllArgsConstructor
 public class RoleDto {
     private String name;
-    private Collection<Page> pages;
+    private Collection<PageDto> pages;
 }

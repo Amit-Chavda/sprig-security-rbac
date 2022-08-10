@@ -1,42 +1,44 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
+import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
-import com.springsecurity.rbac.springsecurityrbac.repository.PagesPrivilegesRepository;
-import com.springsecurity.rbac.springsecurityrbac.repository.RolePagesPrivilegesRepository;
-import com.springsecurity.rbac.springsecurityrbac.service.PageService;
-import com.springsecurity.rbac.springsecurityrbac.service.PagesPrivilegesService;
-import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
-import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
+import com.springsecurity.rbac.springsecurityrbac.service.*;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private RoleService roleService;
     private PrivilegeService privilegeService;
 
-    @Autowired
     private PagesPrivilegesService pagesPrivilegesService;
+    private UserRepository userRepository;
     private PageService pageService;
 
-    private RolePagesPrivilegesRepository rolePagesPrivilegesRepository;
-    private PagesPrivilegesRepository pagesPrivilegesRepository;
+    private RolePagesPrivilegesService rolePagesPrivilegesService;
 
-    public SetupDataLoader(RoleService roleService, PrivilegeService privilegeService, PageService pageService, RolePagesPrivilegesRepository rolePagesPrivilegesRepository, PagesPrivilegesRepository pagesPrivilegesRepository) {
+    public SetupDataLoader(RoleService roleService, PrivilegeService privilegeService,
+                           PagesPrivilegesService pagesPrivilegesService, UserRepository userRepository,
+                           PageService pageService, RolePagesPrivilegesService rolePagesPrivilegesService) {
         this.roleService = roleService;
         this.privilegeService = privilegeService;
+        this.pagesPrivilegesService = pagesPrivilegesService;
+        this.userRepository = userRepository;
         this.pageService = pageService;
-        this.rolePagesPrivilegesRepository = rolePagesPrivilegesRepository;
-        this.pagesPrivilegesRepository = pagesPrivilegesRepository;
+        this.rolePagesPrivilegesService = rolePagesPrivilegesService;
     }
+
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     @Override
     @Transactional
@@ -49,9 +51,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Privilege deletePrivilege = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
 
         //create page
-        Page homePage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.HOME);
-        Page productPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.PRODUCT);
-        Page orderPage = createPageIfNotFound(com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE.ORDER);
+        Page homePage = createPageIfNotFound(PAGE.HOME);
+        Page productPage = createPageIfNotFound(PAGE.PRODUCT);
+        Page orderPage = createPageIfNotFound(PAGE.ORDER);
+        Page summaryPage = createPageIfNotFound(PAGE.SUMMARY);
 
 
         List<Page> pageList = pageService.findAll();
@@ -64,25 +67,27 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 PagesPrivileges pagesPrivileges = new PagesPrivileges();
                 pagesPrivileges.setPage(page);
                 pagesPrivileges.setPrivilege(privilege);
-
-                Optional<PagesPrivileges> pagesPrivilegesOptional = pagesPrivilegesService.alreadyExists(pagesPrivileges);
-
-                if (pagesPrivilegesOptional.isPresent()) {
-                    pagesPrivilegesList.add(pagesPrivilegesOptional.get());
-                } else {
-                    pagesPrivilegesList.add(pagesPrivilegesRepository.save(pagesPrivileges));
-                }
+                pagesPrivilegesList.add(pagesPrivilegesService.save(pagesPrivileges));
             }
         }
+        Role adminRole = new Role("ADMIN");
+        adminRole = roleService.save(adminRole);
 
         for (PagesPrivileges pagesPrivileges : pagesPrivilegesList) {
             RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
             rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
-            rolePagesPrivileges.setRole(createRoleIfNotFound("ADMIN2"));
-            rolePagesPrivilegesRepository.save(rolePagesPrivileges);
+            rolePagesPrivileges.setRole(adminRole);
+            rolePagesPrivilegesService.save(rolePagesPrivileges);
         }
 
-
+        User admin = new User();
+        admin.setFirstName("Admin");
+        admin.setLastName("Admin");
+        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setEmail("admin@test.com");
+        admin.setRoles(List.of(adminRole));
+        admin.setEnabled(true);
+        userRepository.save(admin);
     }
 
     @Transactional
@@ -103,26 +108,5 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             privilegeService.save(privilege);
         }
         return privilege;
-    }
-
-    @Transactional
-    Role createRoleIfNotFound(String name, Collection<PagesPrivileges> pagesPrivileges) {
-        Role role = roleService.findByName(name);
-        if (role == null) {
-            role = new Role(name);
-//            role.setPagesPrivileges(pagesPrivileges);
-            roleService.save(role);
-        }
-        return role;
-    }
-
-    @Transactional
-    Role createRoleIfNotFound(String name) {
-        Role role = roleService.findByName(name);
-        if (role == null) {
-            role = new Role(name);
-            roleService.save(role);
-        }
-        return role;
     }
 }
