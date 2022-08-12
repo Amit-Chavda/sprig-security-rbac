@@ -3,6 +3,7 @@ package com.springsecurity.rbac.springsecurityrbac.service;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
+import com.springsecurity.rbac.springsecurityrbac.util.AuthorityUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -48,7 +49,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 true,
                 true,
                 true,
-                null//etAuthorities(user.getRoles())
+                AuthorityUtil.getAllGrantedAuthorities(user)
         );
     }
 /*

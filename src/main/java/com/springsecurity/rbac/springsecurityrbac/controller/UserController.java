@@ -7,9 +7,12 @@ import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.repository.PageRepository;
+import com.springsecurity.rbac.springsecurityrbac.security.JdbcRoleChecker;
 import com.springsecurity.rbac.springsecurityrbac.service.*;
 import com.springsecurity.rbac.springsecurityrbac.util.AuthorityUtil;
 import com.springsecurity.rbac.springsecurityrbac.util.PrivilegeUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -156,7 +159,7 @@ public class UserController {
         user.setEnabled(true);
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
         //set roles
         user.setRoles(roleSet);
         //save users
@@ -167,15 +170,11 @@ public class UserController {
 
     @GetMapping("test")
     public List<RoleDto> test(HttpServletRequest request) {
-        //JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
-        //jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request);
-
+        JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
+        jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request);
         User user = userService.findAll().get(0);
-
-        AuthorityUtil.getAllGrantedAuthorities(user).stream().forEach(System.out::println);
+        //AuthorityUtil.getAllGrantedAuthorities(user).stream().forEach(System.out::println);
 
         return AuthorityUtil.getRoleAndAuthorities(user);
-
-
     }
 }
