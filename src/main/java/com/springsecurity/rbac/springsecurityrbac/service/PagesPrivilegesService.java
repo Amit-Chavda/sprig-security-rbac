@@ -20,7 +20,10 @@ public class PagesPrivilegesService {
     }
 
     public PagesPrivileges save(PagesPrivileges pagesPrivileges) {
-        Optional<PagesPrivileges> pagesPrivilegesOptional = pagesPrivilegesRepository.alreadyExists(pagesPrivileges.getPrivilege().getId(), pagesPrivileges.getPage().getId());
+        Optional<PagesPrivileges> pagesPrivilegesOptional = pagesPrivilegesRepository.alreadyExists(
+                pagesPrivileges.getPrivilege().getId(),
+                pagesPrivileges.getPage().getId()
+        );
         return pagesPrivilegesOptional.orElseGet(() -> pagesPrivilegesRepository.save(pagesPrivileges));
     }
 }
