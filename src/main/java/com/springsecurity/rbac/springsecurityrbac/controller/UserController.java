@@ -10,7 +10,10 @@ import com.springsecurity.rbac.springsecurityrbac.repository.PageRepository;
 import com.springsecurity.rbac.springsecurityrbac.security.JdbcRoleChecker;
 import com.springsecurity.rbac.springsecurityrbac.service.*;
 import com.springsecurity.rbac.springsecurityrbac.util.AuthorityUtil;
+import com.springsecurity.rbac.springsecurityrbac.util.Console;
 import com.springsecurity.rbac.springsecurityrbac.util.PrivilegeUtil;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -169,9 +172,25 @@ public class UserController {
 
 
     @GetMapping("test")
-    public List<RoleDto> test(HttpServletRequest request) {
+    @PreAuthorize(value = "@roleChecker.check(authentication,#request)")
+    public List<RoleDto> test( HttpServletRequest request) {
         JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
-        jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request);
+
+        // Console.println("Accessible :" + jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request) + "", UserController.class);
+        ;
+        User user = userService.findAll().get(0);
+        //AuthorityUtil.getAllGrantedAuthorities(user).stream().forEach(System.out::println);
+
+        return AuthorityUtil.getRoleAndAuthorities(user);
+    }
+
+    @PostMapping("test")
+    @PreAuthorize(value = "@roleChecker.check(authentication,#request)")
+    public List<RoleDto> testPost( HttpServletRequest request) {
+        JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
+
+        // Console.println("Accessible :" + jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request) + "", UserController.class);
+        ;
         User user = userService.findAll().get(0);
         //AuthorityUtil.getAllGrantedAuthorities(user).stream().forEach(System.out::println);
 
