@@ -6,11 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleDto {
     private String name;
-    private Collection<PageDto> pages;
+    private Map<PageDto, List<PrivilegeDto>> pagePrivilegeMap;
+
 }

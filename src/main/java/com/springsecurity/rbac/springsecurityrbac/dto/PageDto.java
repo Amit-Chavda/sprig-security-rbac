@@ -4,6 +4,7 @@ import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 
@@ -12,5 +13,4 @@ import java.util.Collection;
 @AllArgsConstructor
 public class PageDto {
     private String name;
-    private Collection<PrivilegeDto> privileges;
 }

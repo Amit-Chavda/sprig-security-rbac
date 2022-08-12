@@ -1,27 +1,25 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
+    private RolePagesPrivilegesService rolePagesPrivilegesService;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
+
+    public UserDetailsServiceImpl(UserRepository userRepository, RolePagesPrivilegesService rolePagesPrivilegesService) {
         this.userRepository = userRepository;
+        this.rolePagesPrivilegesService = rolePagesPrivilegesService;
     }
 
     @Override
@@ -32,6 +30,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         User user = optionalUser.get();
+      /*  Collection<Role> roles = user.getRoles();
+
+        roles.forEach(role -> {
+            role.getRolePagesPrivileges().forEach(
+                    rolePagesPrivilege -> {
+                        rolePagesPrivilege.getPagesPrivileges().getPage().get
+                    }
+            );
+        });
+*/
+
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
