@@ -151,7 +151,6 @@ public class UserController {
                                         }
                                         rolePagesPrivileges.setRole(role);
                                         rolePagesPrivilegesService.save(rolePagesPrivileges);
-
                                         return role;
                                     }).collect(Collectors.toSet());
 
