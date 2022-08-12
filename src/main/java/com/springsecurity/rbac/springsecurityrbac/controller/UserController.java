@@ -1,7 +1,5 @@
 package com.springsecurity.rbac.springsecurityrbac.controller;
 
-import com.springsecurity.rbac.springsecurityrbac.dto.PageDto;
-import com.springsecurity.rbac.springsecurityrbac.dto.PrivilegeDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
@@ -10,16 +8,14 @@ import com.springsecurity.rbac.springsecurityrbac.repository.PageRepository;
 import com.springsecurity.rbac.springsecurityrbac.security.JdbcRoleChecker;
 import com.springsecurity.rbac.springsecurityrbac.service.*;
 import com.springsecurity.rbac.springsecurityrbac.util.AuthorityUtil;
-import com.springsecurity.rbac.springsecurityrbac.util.Console;
-import com.springsecurity.rbac.springsecurityrbac.util.PrivilegeUtil;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -112,7 +108,6 @@ public class UserController {
     @PostMapping("/create")
     public UserDto createUser(@RequestBody UserDto userDto) {
 
-
         Set<Role> roleSet = userDto.getRoles().stream()
                 .map(
                         roleDto -> {
@@ -142,10 +137,18 @@ public class UserController {
                                     .map(pagesPrivileges -> {
                                         Role role = new Role();
                                         role.setName(roleDto.getName());
-                                        role = roleService.save(role);
 
                                         RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
-                                        rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
+
+                                        //role already exists then just assign existing role
+                                        //else create new and then assign
+                                        if (roleService.findByName(role.getName()).isEmpty()) {
+                                            role = roleService.save(role);
+                                            rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
+                                        } else {
+                                            role = roleService.save(role);
+                                            rolePagesPrivileges.setPagesPrivileges(rolePagesPrivileges.getPagesPrivileges());
+                                        }
                                         rolePagesPrivileges.setRole(role);
                                         rolePagesPrivilegesService.save(rolePagesPrivileges);
 
@@ -173,7 +176,7 @@ public class UserController {
 
     @GetMapping("test")
     @PreAuthorize(value = "@roleChecker.check(authentication,#request)")
-    public List<RoleDto> test( HttpServletRequest request) {
+    public List<RoleDto> test(HttpServletRequest request) {
         JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
 
         // Console.println("Accessible :" + jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request) + "", UserController.class);
@@ -186,7 +189,7 @@ public class UserController {
 
     @PostMapping("test")
     @PreAuthorize(value = "@roleChecker.check(authentication,#request)")
-    public List<RoleDto> testPost( HttpServletRequest request) {
+    public List<RoleDto> testPost(HttpServletRequest request) {
         JdbcRoleChecker jdbcRoleChecker = new JdbcRoleChecker();
 
         // Console.println("Accessible :" + jdbcRoleChecker.check(SecurityContextHolder.getContext().getAuthentication(), request) + "", UserController.class);
