@@ -5,30 +5,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.Set;
-import java.util.function.Supplier;
 
 @Component(value = "roleChecker")
 public class JdbcRoleChecker implements RoleChecker {
 
     private Logger logger = LoggerFactory.getLogger(JdbcRoleChecker.class);
-   // private Supplier<Set<AntPathRequestMatcher>> supplier;
+    // private Supplier<Set<AntPathRequestMatcher>> supplier;
+
+    private HttpServletRequest request;
+
+    public JdbcRoleChecker(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Override
-    public boolean check(Authentication authentication, HttpServletRequest request) {
-        //todo: not null check
+    public boolean check(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated() || request.getParameter("pageCode") == null) {
             logger.error("Unauthorized user or invalid url access!");
             return false;
         }
 
-        String pageCode = request.getParameter("pageCode").toUpperCase();
+        String pageCode = this.request.getParameter("pageCode").toUpperCase();
 
         if (hasAccessToPage(authentication.getAuthorities(), pageCode)) {
             if (hasAuthorityToAction(authentication.getAuthorities(), request.getMethod())) {
@@ -42,21 +43,13 @@ public class JdbcRoleChecker implements RoleChecker {
     }
 
     private boolean hasAuthorityToAction(Collection<? extends GrantedAuthority> authorities, String method) {
-        String privilege = null;
-        switch (method.toUpperCase()) {
-            case "GET":
-                privilege = PRIVILEGE.READ;
-                break;
-            case "PUT":
-                privilege = PRIVILEGE.UPDATE;
-                break;
-            case "POST":
-                privilege = PRIVILEGE.CREATE;
-                break;
-            case "DELETE":
-                privilege = PRIVILEGE.DELETE;
-                break;
-        }
+        String privilege = switch (method.toUpperCase()) {
+            case "GET" -> PRIVILEGE.READ;
+            case "PUT" -> PRIVILEGE.UPDATE;
+            case "POST" -> PRIVILEGE.CREATE;
+            case "DELETE" -> PRIVILEGE.DELETE;
+            default -> null;
+        };
 
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().split("\\.")[1].equals(privilege)) {
@@ -64,7 +57,6 @@ public class JdbcRoleChecker implements RoleChecker {
             }
         }
         return false;
-
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.springsecurity.rbac.springsecurityrbac.util;
 import com.springsecurity.rbac.springsecurityrbac.dto.PageDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.PrivilegeDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.PagesPrivileges;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.RolePagesPrivileges;
@@ -13,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AuthorityUtil {
-    private AuthorityUtil() {
+public class SimpleUserUtil {
+    private SimpleUserUtil() {
         throw new IllegalStateException("Authority Utility class");
     }
 
@@ -81,6 +82,17 @@ public class AuthorityUtil {
                 .stream()
                 .flatMap(List::stream)
                 .toList();
+    }
+
+    public static UserDto toUserDto(User user) {
+
+        UserDto userDto = new UserDto();
+        userDto.setEmail(user.getEmail());
+        userDto.setEnabled(user.isEnabled());
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
+        userDto.setRoles(getRoleAndAuthorities(user));
+        return userDto;
     }
 
 }

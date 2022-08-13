@@ -1,43 +1,42 @@
 package com.springsecurity.rbac.springsecurityrbac;
 
-import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.dto.PageDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.PrivilegeDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PAGE;
 import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PRIVILEGE;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
-import com.springsecurity.rbac.springsecurityrbac.service.*;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.exception.UserAlreadyExistException;
+import com.springsecurity.rbac.springsecurityrbac.service.PageService;
+import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
+import com.springsecurity.rbac.springsecurityrbac.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    private RoleService roleService;
+
+    private Logger logger = LoggerFactory.getLogger(SetupDataLoader.class);
     private PrivilegeService privilegeService;
 
-    private PagesPrivilegesService pagesPrivilegesService;
     private UserService userService;
     private PageService pageService;
 
-    private RolePagesPrivilegesService rolePagesPrivilegesService;
-
-    public SetupDataLoader(RoleService roleService, PrivilegeService privilegeService,
-                           PagesPrivilegesService pagesPrivilegesService,
-                           UserService userService, PageService pageService, RolePagesPrivilegesService rolePagesPrivilegesService) {
-        this.roleService = roleService;
+    public SetupDataLoader(PrivilegeService privilegeService, UserService userService, PageService pageService) {
         this.privilegeService = privilegeService;
-        this.pagesPrivilegesService = pagesPrivilegesService;
         this.userService = userService;
         this.pageService = pageService;
-        this.rolePagesPrivilegesService = rolePagesPrivilegesService;
     }
-
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     @Override
@@ -51,45 +50,46 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         privilegeService.save(new Privilege(PRIVILEGE.UPDATE));
         privilegeService.save(new Privilege(PRIVILEGE.DELETE));
 
+        //setup default pages
         pageService.save(new Page(PAGE.HOME));
         pageService.save(new Page(PAGE.SUMMARY));
         pageService.save(new Page(PAGE.ORDER));
         pageService.save(new Page(PAGE.PRODUCT));
 
-
         //prepare all privileges for root user
-        List<Page> pageList = pageService.findAll();
-        List<Privilege> privilegeList = privilegeService.findAll();
+        HashMap<PageDto, List<PrivilegeDto>> adminRole = new HashMap<>();
 
-        List<PagesPrivileges> pagesPrivilegesList = new ArrayList<>();
+        List<PrivilegeDto> prList = privilegeService.findAll()
+                .stream()
+                .map(privilege -> new PrivilegeDto(privilege.getName()))
+                .toList();
 
-        for (Page page : pageList) {
-            for (Privilege privilege : privilegeList) {
-                PagesPrivileges pagesPrivileges = new PagesPrivileges();
-                pagesPrivileges.setPage(page);
-                pagesPrivileges.setPrivilege(privilege);
-                pagesPrivilegesList.add(pagesPrivilegesService.save(pagesPrivileges));
-            }
+        List<PageDto> pageList = pageService.findAll()
+                .stream()
+                .map(page -> new PageDto(page.getName()))
+                .toList();
+
+        for (PageDto pageDto : pageList) {
+            adminRole.put(pageDto, prList);
         }
-        //root admin role
-        Role adminRole = new Role("ADMIN");
-        adminRole = roleService.save(adminRole);
 
-        for (PagesPrivileges pagesPrivileges : pagesPrivilegesList) {
-            RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
-            rolePagesPrivileges.setPagesPrivileges(pagesPrivileges);
-            rolePagesPrivileges.setRole(adminRole);
-            rolePagesPrivilegesService.save(rolePagesPrivileges);
-        }
+
+        RoleDto adminRoleDto = new RoleDto("ADMIN", adminRole);
 
         //setup default root admin
-        User admin = new User();
+        UserDto admin = new UserDto();
         admin.setFirstName("Admin");
         admin.setLastName("Admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setPassword(new BCryptPasswordEncoder().encode("admin"));
         admin.setEmail("admin@test.com");
-        admin.setRoles(List.of(adminRole));
+        admin.setRoles(List.of(adminRoleDto));
         admin.setEnabled(true);
-        userService.save(admin);
+
+        try {
+            userService.createUser(admin);
+        } catch (UserAlreadyExistException e) {
+            logger.info(e.toString());
+        }
+
     }
 }

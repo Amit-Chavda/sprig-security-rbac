@@ -1,15 +1,13 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
-import com.springsecurity.rbac.springsecurityrbac.util.AuthorityUtil;
+import com.springsecurity.rbac.springsecurityrbac.util.SimpleUserUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -49,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 true,
                 true,
                 true,
-                AuthorityUtil.getAllGrantedAuthorities(user)
+                SimpleUserUtil.getAllGrantedAuthorities(user)
         );
     }
 /*

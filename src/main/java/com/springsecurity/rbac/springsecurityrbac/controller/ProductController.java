@@ -20,32 +20,32 @@ public class ProductController {
     }
 
     @GetMapping("/findAll")
-    @PreAuthorize(value = "hasAnyRole('ROLE_VIEWER','ROLE_ADMIN','ROLE_EDITOR','ROLE_CREATOR')")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
     public List<Product> findAllProduct() {
         return productService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize(value = "hasAnyRole('ROLE_VIEWER','ROLE_ADMIN','ROLE_EDITOR','ROLE_CREATOR')")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
     public Product findProductById(@PathVariable Long id) {
         return productService.findById(id);
     }
 
     @PostMapping("/create")
-    @PreAuthorize(value = "hasAnyRole('ROLE_ADMIN','ROLE_CREATOR')")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
     public ResponseEntity<Product> createNewProduct(@RequestBody Product product) {
         product = productService.saveProduct(product);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
     @PutMapping("/edit")
-    @PreAuthorize(value = "hasAnyRole('ROLE_ADMIN','ROLE_EDITOR')")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
     public Product editProduct(@RequestBody Product product) {
         return productService.saveProduct(product);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
     public String deleteProductByID(@PathVariable long id) {
         productService.removeById(id);
         return "success";
