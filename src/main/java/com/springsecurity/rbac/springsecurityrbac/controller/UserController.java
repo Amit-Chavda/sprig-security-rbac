@@ -25,10 +25,9 @@ public class UserController {
             return userService.createUser(userDto);
         } catch (UserAlreadyExistException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-
         }
-    }
 
+    }
 
     @GetMapping("/findAll")
     public List<UserDto> getAllUsers() {

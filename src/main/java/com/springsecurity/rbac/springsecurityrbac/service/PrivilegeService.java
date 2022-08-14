@@ -23,7 +23,6 @@ public class PrivilegeService {
         return privilegeRepository.findByName(name);
     }
 
-
     public Privilege save(Privilege privilege) {
         Optional<Privilege> privilegeOptional = findByName(privilege.getName());
         return privilegeOptional.orElseGet(() -> privilegeRepository.save(privilege));

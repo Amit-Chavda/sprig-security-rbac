@@ -84,17 +84,6 @@ public class SimpleUserUtil {
                 .toList();
     }
 
-    public static UserDto toUserDto(User user) {
-
-        UserDto userDto = new UserDto();
-        userDto.setEmail(user.getEmail());
-        userDto.setEnabled(user.isEnabled());
-        userDto.setFirstName(user.getFirstName());
-        userDto.setLastName(user.getLastName());
-        userDto.setRoles(getRoleAndAuthorities(user));
-        return userDto;
-    }
-
 }
 
 

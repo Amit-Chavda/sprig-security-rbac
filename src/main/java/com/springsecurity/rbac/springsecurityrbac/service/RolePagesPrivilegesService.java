@@ -16,7 +16,9 @@ public class RolePagesPrivilegesService {
     }
 
     public Optional<RolePagesPrivileges> alreadyExists(RolePagesPrivileges rolePagesPrivileges) {
-        return rolePagesPrivilegesRepository.alreadyExists(rolePagesPrivileges.getRole().getId(), rolePagesPrivileges.getPagesPrivileges().getId());
+
+        return Optional.ofNullable(rolePagesPrivilegesRepository.alreadyExists(rolePagesPrivileges.getRole().getId(),
+                rolePagesPrivileges.getPagesPrivileges().getId()).orElse(null));
 
     }
 

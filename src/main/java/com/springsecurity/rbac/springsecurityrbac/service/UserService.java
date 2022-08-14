@@ -2,66 +2,58 @@ package com.springsecurity.rbac.springsecurityrbac.service;
 
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
-import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.exception.UserAlreadyExistException;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
-import com.springsecurity.rbac.springsecurityrbac.util.SimpleUserUtil;
+import com.springsecurity.rbac.springsecurityrbac.util.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
-    private PrivilegeService privilegeService;
-    private PageService pageService;
-    private PagesPrivilegesService pagesPrivilegesService;
-    private RoleService roleService;
-    private RolePagesPrivilegesService rolePagesPrivilegesService;
     private UserRepository userRepository;
 
 
-    public UserService(PrivilegeService privilegeService, PageService pageService, PagesPrivilegesService pagesPrivilegesService,
-                       RoleService roleService, RolePagesPrivilegesService rolePagesPrivilegesService, UserRepository userRepository) {
-        this.privilegeService = privilegeService;
-        this.pageService = pageService;
-        this.pagesPrivilegesService = pagesPrivilegesService;
-        this.roleService = roleService;
-        this.rolePagesPrivilegesService = rolePagesPrivilegesService;
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User findById(long id) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findById(id);
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 
-        if (Optional.of(user).isEmpty()) {
-            throw new UsernameNotFoundException("User with {}" + id + " does not exists!");
+    public UserDto createUser(UserDto userDto) throws UserAlreadyExistException {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(), "User with "
+                    + userDto.getEmail() + " already exist!", LocalDateTime.now());
         }
-        return user.get();
+        return UserMapper.toUserDto(save(UserMapper.toUser(userDto)));
+
     }
 
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(SimpleUserUtil::toUserDto)
+                .map(UserMapper::toUserDto)
                 .toList();
     }
 
-    public void removeById(long id) {
-        userRepository.deleteById(id);
+    public User findByEmail(String username) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmail(username);
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("User with email {}" + username + " does not exists!");
+        }
+        return optionalUser.get();
     }
 
-    public UserDto createUser(UserDto userDto) throws UserAlreadyExistException{
+/*    public UserDto createUser(UserDto userDto) throws UserAlreadyExistException {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(), "User with " + userDto.getEmail() + " already exist!", LocalDateTime.now());
         }
@@ -133,7 +125,7 @@ public class UserService {
         //save users
         userRepository.save(user);
         return userDto;
-    }
+    }*/
 
 
     /*
