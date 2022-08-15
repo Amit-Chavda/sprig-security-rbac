@@ -35,4 +35,8 @@ public class PagesPrivileges {
     @OneToMany(mappedBy = "pagesPrivileges", cascade = CascadeType.ALL)
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 
+    public PagesPrivileges(Page page, Privilege privilege) {
+        this.page = page;
+        this.privilege = privilege;
+    }
 }

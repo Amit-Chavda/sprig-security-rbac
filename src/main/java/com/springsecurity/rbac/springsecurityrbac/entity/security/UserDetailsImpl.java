@@ -1,14 +1,19 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
+import com.springsecurity.rbac.springsecurityrbac.dto.PrivilegeDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +25,33 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return RoleMapper.toRoleDtos(user.getRoles())
+                .stream()
+                .map(roleDto -> {
+                    List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>(
+                            roleDto.getPagePrivilegeMap()
+                                    .entrySet()
+                                    .stream()
+                                    .map(pageDtoListEntry -> {
+
+                                        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+
+                                        for (PrivilegeDto privilegeDto : pageDtoListEntry.getValue()) {
+                                            grantedAuthorities.add(new SimpleGrantedAuthority(
+                                                    pageDtoListEntry.getKey().getName() + "." + privilegeDto.getName()
+                                            ));
+                                        }
+                                        return grantedAuthorities;
+                                    }).toList()
+                                    .stream()
+                                    .flatMap(List::stream)
+                                    .toList());
+                    simpleGrantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleDto.getName()));
+                    return simpleGrantedAuthorities;
+                }).toList()
+                .stream()
+                .flatMap(List::stream)
+                .toList();
     }
 
     @Override
@@ -52,4 +83,5 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return user.isEnabled();
     }
+
 }
