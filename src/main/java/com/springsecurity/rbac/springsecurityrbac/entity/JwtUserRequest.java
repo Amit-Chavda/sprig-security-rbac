@@ -1,6 +1,5 @@
 package com.springsecurity.rbac.springsecurityrbac.entity;
 
-import com.sun.istack.NotNull;
 import lombok.Data;
 
 @Data

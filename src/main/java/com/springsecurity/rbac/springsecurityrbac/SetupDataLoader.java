@@ -58,6 +58,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         pageService.save(new Page(PAGE.ROLE));
         pageService.save(new Page(PAGE.PRODUCT));
 
+
         //prepare all privileges for root user
         HashMap<PageDto, Collection<PrivilegeDto>> adminRole = new HashMap<>();
 
@@ -71,8 +72,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         RoleDto adminRoleDto = new RoleDto("ADMIN", adminRole);
 
-
-        roleService.createRole(adminRoleDto);
+        try {
+            roleService.createRole(adminRoleDto);
+        } catch (Exception e) {
+            logger.error(e.toString());
+        }
 
 
         UserDto admin = new UserDto();
@@ -84,11 +88,23 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         admin.setEmail("admin@test.com");
         admin.setRoles(List.of(adminRoleDto));
         admin.setEnabled(true);
-        userService.createUser(admin);
+
+
+        try {
+            userService.createUser(admin);
+        } catch (Exception e) {
+            logger.error(e.toString());
+        }
 
         AssignRole assignRole = new AssignRole();
         assignRole.setUsername(admin.getEmail());
         assignRole.setRoleNames(new ArrayList<>(Collections.singleton(adminRoleDto.getName())));
-        roleService.assignRole(assignRole);
+
+        try {
+            roleService.assignRole(assignRole);
+        } catch (Exception e) {
+            logger.error(e.toString());
+        }
     }
 }
+

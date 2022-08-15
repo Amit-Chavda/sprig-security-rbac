@@ -8,6 +8,7 @@ import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,7 +35,9 @@ public class UserService {
             throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(),
                     "User with " + userDto.getEmail() + " already exist!", LocalDateTime.now());
         }
-        return UserMapper.toUserDto(save(UserMapper.toUser(userDto)));
+        User user = UserMapper.toUser(userDto);
+        user.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
+        return UserMapper.toUserDto(save(user));
 
     }
 
@@ -48,7 +51,7 @@ public class UserService {
     public User findByEmail(String username) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.findByEmail(username);
         if (optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException("User with email {}" + username + " does not exists!");
+            throw new UsernameNotFoundException("User with email " + username + " does not exists!");
         }
         return optionalUser.get();
     }

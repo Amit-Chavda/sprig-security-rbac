@@ -80,6 +80,7 @@ public class RoleService {
         logger.info("New role with name {} is created!", role.getName());
         return RoleMapper.toRoleDto(roleRepository.save(role));
     }
+
     public UserDto assignRole(AssignRole assignRole) throws UsernameNotFoundException, RoleNotFoundException {
 
         List<Role> roles = assignRole.getRoleNames().stream().map(roleRepository::findByName).toList();
@@ -95,8 +96,9 @@ public class RoleService {
                     roleCollection.add(newRole);
                 }
             });
+        } else {
+            roleCollection.addAll(roles);
         }
-        roleCollection.addAll(roles);
         user.setRoles(roleCollection);
         logger.info("New role(s) {} assigned to user {}", assignRole.getRoleNames(), assignRole.getUsername());
         return UserMapper.toUserDto(userService.save(user));
