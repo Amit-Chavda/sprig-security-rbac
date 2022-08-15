@@ -1,4 +1,4 @@
-package com.springsecurity.rbac.springsecurityrbac.entity.security;
+package com.springsecurity.rbac.springsecurityrbac.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

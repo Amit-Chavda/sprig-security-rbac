@@ -1,5 +1,7 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
+import com.springsecurity.rbac.springsecurityrbac.dto.AssignRole;
+import com.springsecurity.rbac.springsecurityrbac.dto.RevokeRole;
 import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
@@ -9,7 +11,6 @@ import com.springsecurity.rbac.springsecurityrbac.exception.RoleNotFoundExceptio
 import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
 import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
-import com.springsecurity.rbac.springsecurityrbac.util.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -112,5 +113,23 @@ public class RoleService {
 
     public void delete(Role role) {
         roleRepository.delete(role);
+    }
+
+    public UserDto revokeRole(RevokeRole revokeRole) {
+        List<Role> revokingRoles = revokeRole.getRoleNames().stream().map(roleRepository::findByName).toList();
+
+        User user = userService.findByEmail(revokeRole.getUsername());
+        Collection<Role> roleCollection = new ArrayList<>(user.getRoles());
+
+        //add new role only if user doesn't have that role already
+        revokingRoles.forEach(existingRole -> {
+            if (roleCollection.contains(existingRole)) {
+                roleCollection.remove(existingRole);
+            }
+        });
+
+        user.setRoles(roleCollection);
+        logger.info("Role(s) {} revoked from user {}", revokeRole.getRoleNames(), revokeRole.getUsername());
+        return UserMapper.toUserDto(userService.save(user));
     }
 }
