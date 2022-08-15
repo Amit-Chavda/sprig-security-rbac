@@ -13,7 +13,7 @@ import java.util.Collection;
 @Component(value = "roleChecker")
 public class JdbcRoleChecker implements RoleChecker {
 
-    private Logger logger = LoggerFactory.getLogger(JdbcRoleChecker.class);
+    private final Logger logger = LoggerFactory.getLogger(JdbcRoleChecker.class);
     // private Supplier<Set<AntPathRequestMatcher>> supplier;
 
     private HttpServletRequest request;

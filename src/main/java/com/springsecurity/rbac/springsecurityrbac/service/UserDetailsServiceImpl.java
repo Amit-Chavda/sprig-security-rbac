@@ -1,8 +1,8 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.UserDetailsImpl;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
-import com.springsecurity.rbac.springsecurityrbac.util.SimpleUserUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,12 +13,10 @@ import java.util.Optional;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
-    private RolePagesPrivilegesService rolePagesPrivilegesService;
 
 
-    public UserDetailsServiceImpl(UserRepository userRepository, RolePagesPrivilegesService rolePagesPrivilegesService) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.rolePagesPrivilegesService = rolePagesPrivilegesService;
     }
 
     @Override
@@ -27,54 +25,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("User with email " + email + " does not exist!");
         }
-
-        User user = optionalUser.get();
-      /*  Collection<Role> roles = user.getRoles();
-
-        roles.forEach(role -> {
-            role.getRolePagesPrivileges().forEach(
-                    rolePagesPrivilege -> {
-                        rolePagesPrivilege.getPagesPrivileges().getPage().get
-                    }
-            );
-        });
-*/
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.isEnabled(),
-                true,
-                true,
-                true,
-                SimpleUserUtil.getAllGrantedAuthorities(user)
-        );
+        return new UserDetailsImpl(optionalUser.get());
     }
-/*
-    private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
-        return getGrantedAuthorities(getPrivileges(roles));
-    }
-
-
-    private List<String> getPrivileges(Collection<Role> roles) {
-
-        List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
-        for (Role role : roles) {
-            privileges.add(role.getName());
-            collection.addAll(role.getPrivileges());
-        }
-        for (Privilege item : collection) {
-            privileges.add(item.getName());
-        }
-        return privileges;
-    }
-
-    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String privilege : privileges) {
-            authorities.add(new SimpleGrantedAuthority(privilege));
-        }
-        return authorities;
-    }*/
 }

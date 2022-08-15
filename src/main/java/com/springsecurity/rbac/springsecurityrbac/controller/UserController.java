@@ -26,7 +26,6 @@ public class UserController {
         } catch (UserAlreadyExistException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-
     }
 
     @GetMapping("/findAll")

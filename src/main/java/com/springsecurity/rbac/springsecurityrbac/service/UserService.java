@@ -4,7 +4,7 @@ import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.exception.UserAlreadyExistException;
 import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
-import com.springsecurity.rbac.springsecurityrbac.util.UserMapper;
+import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

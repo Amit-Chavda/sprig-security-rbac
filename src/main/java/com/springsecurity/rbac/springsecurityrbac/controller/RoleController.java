@@ -6,13 +6,13 @@ import com.springsecurity.rbac.springsecurityrbac.entity.security.AssignRole;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleAlreadyExistException;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleNotFoundException;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
-import com.springsecurity.rbac.springsecurityrbac.util.RoleUtil;
+import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/role")
@@ -26,14 +26,14 @@ public class RoleController {
 
 
     @GetMapping("/findAll")
-    public List<RoleDto> findAllRoles() {
+    public Collection<RoleDto> findAllRoles() {
         return roleService.findAll();
     }
 
     @GetMapping("/findByName")
     public RoleDto findRoleByName(@RequestParam String name) {
         try {
-            return RoleUtil.toRoleDto(roleService.findByName(name));
+            return RoleMapper.toRoleDto(roleService.findByName(name));
         } catch (RoleNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

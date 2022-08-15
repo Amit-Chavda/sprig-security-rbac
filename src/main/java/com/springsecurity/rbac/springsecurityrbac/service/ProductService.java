@@ -12,9 +12,9 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    private Logger logger = LoggerFactory.getLogger(ProductService.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
