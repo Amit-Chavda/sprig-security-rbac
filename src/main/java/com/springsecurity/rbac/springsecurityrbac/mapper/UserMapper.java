@@ -1,4 +1,4 @@
-package com.springsecurity.rbac.springsecurityrbac.util;
+package com.springsecurity.rbac.springsecurityrbac.mapper;
 
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
