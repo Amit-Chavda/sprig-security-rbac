@@ -26,4 +26,8 @@ public class RolePagesPrivilegesService {
         Optional<RolePagesPrivileges> pagesPrivilegesOptional = alreadyExists(rolePagesPrivileges);
         return pagesPrivilegesOptional.orElseGet(() -> rolePagesPrivilegesRepository.save(rolePagesPrivileges));
     }
+
+    public void delete(RolePagesPrivileges rolePagesPrivileges) {
+        rolePagesPrivilegesRepository.delete(rolePagesPrivileges);
+    }
 }

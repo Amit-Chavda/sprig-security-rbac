@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(uniqueConstraints={
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"privilege_id", "page_id"})
 })
 public class PagesPrivileges {
@@ -22,17 +22,17 @@ public class PagesPrivileges {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(targetEntity = Page.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Page.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "page_id", referencedColumnName = "id")
     private Page page;
 
 
-    @ManyToOne(targetEntity = Privilege.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Privilege.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "privilege_id", referencedColumnName = "id")
     private Privilege privilege;
 
 
-    @OneToMany(mappedBy = "pagesPrivileges", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "pagesPrivileges", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 
     public PagesPrivileges(Page page, Privilege privilege) {

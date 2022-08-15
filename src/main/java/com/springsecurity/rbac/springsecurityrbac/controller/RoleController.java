@@ -59,11 +59,7 @@ public class RoleController {
 
     @PutMapping("/update")
     public RoleDto updateRole(@RequestBody RoleDto roleDto) {
-        try {
-            return roleService.updateRole(roleDto);
-        } catch (RoleNotFoundException | UsernameNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        return roleService.updateRole(roleDto);
     }
 
 }

@@ -35,7 +35,6 @@ public class PageMapper {
             pagesPrivileges.setPage(page);
             pagesPrivileges.setPrivilege(privilege);
             pagesPrivilegesList1.add(pagesPrivileges);
-            Console.println(pagesPrivileges.toString(),PageMapper.class);
         }
         return pagesPrivilegesList1;
     }

@@ -21,10 +21,10 @@ public class Role {
     private Long id;
 
     private String name;
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Collection<User> users;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "role")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "role", cascade = {CascadeType.ALL})
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 
     public Role(String name) {

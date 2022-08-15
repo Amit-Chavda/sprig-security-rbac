@@ -59,7 +59,6 @@ public class RoleService {
     }
 
     public RoleDto createRole(RoleDto roleDto) throws RoleAlreadyExistException {
-        Console.println(roleRepository.existsByName(roleDto.getName()) + "", RoleService.class);
 
         if (roleRepository.existsByName(roleDto.getName())) {
             throw new RoleAlreadyExistException(RoleAlreadyExistException.class.getName(),
@@ -90,7 +89,6 @@ public class RoleService {
 
         User user = userService.findByEmail(assignRole.getUsername());
 
-        //user.setRoles(roles); //java.lang.UnsupportedOperationException: null
         user.setRoles(new ArrayList<>(roles));
         logger.info("New role {} assigned to user {}", assignRole.getRoleNames(), assignRole.getUsername());
         return UserMapper.toUserDto(userService.save(user));
@@ -101,10 +99,9 @@ public class RoleService {
     }
 
     public RoleDto updateRole(RoleDto roleDto) {
-        //delete existing role
         Role role = findByName(roleDto.getName());
-        delete(role);
-        //create new role and return
+        role.getRolePagesPrivileges().forEach(rolePagesPrivilegesService::delete);
+        roleRepository.delete(role);
         return createRole(roleDto);
     }
 
