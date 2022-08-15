@@ -16,10 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoleService {
@@ -88,9 +85,17 @@ public class RoleService {
         List<Role> roles = assignRole.getRoleNames().stream().map(roleRepository::findByName).toList();
 
         User user = userService.findByEmail(assignRole.getUsername());
+        Collection<Role> roleCollection = new ArrayList<>(user.getRoles());
 
-        user.setRoles(new ArrayList<>(roles));
-        logger.info("New role {} assigned to user {}", assignRole.getRoleNames(), assignRole.getUsername());
+        //add new role only if user doesn't have that role already
+        roles.forEach(newRole -> {
+            if (!roleCollection.contains(newRole)) {
+                roleCollection.add(newRole);
+            }
+        });
+
+        user.setRoles(roleCollection);
+        logger.info("New role(s) {} assigned to user {}", assignRole.getRoleNames(), assignRole.getUsername());
         return UserMapper.toUserDto(userService.save(user));
     }
 

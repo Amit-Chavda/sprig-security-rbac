@@ -10,6 +10,7 @@ public class UserMapper {
         userDto.setEnabled(user.isEnabled());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
+        userDto.setRoles(RoleMapper.toRoleDtos(user.getRoles()));
         return userDto;
     }
 
