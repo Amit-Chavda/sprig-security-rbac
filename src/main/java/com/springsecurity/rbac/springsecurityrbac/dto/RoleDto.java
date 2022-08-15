@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 @Data
@@ -12,5 +12,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class RoleDto {
     private String name;
-    private Map<PageDto, List<PrivilegeDto>> pagePrivilegeMap;
+    private Map<PageDto, Collection<PrivilegeDto>> pagePrivilegeMap;
 }

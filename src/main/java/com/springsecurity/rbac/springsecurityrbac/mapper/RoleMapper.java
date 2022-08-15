@@ -30,7 +30,7 @@ public class RoleMapper {
         );
 
 
-        Map<PageDto, List<PrivilegeDto>> pageDtoListMap =
+        Map<PageDto, Collection<PrivilegeDto>> pageDtoListMap =
                 map.entrySet().stream().collect(
                         Collectors.toMap(stringListEntry -> new PageDto(stringListEntry.getKey()),
                                 o -> o.getValue().stream().map(PrivilegeDto::new).toList()

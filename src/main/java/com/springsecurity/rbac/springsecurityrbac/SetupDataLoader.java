@@ -9,6 +9,8 @@ import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PRIVILEGE;
 import com.springsecurity.rbac.springsecurityrbac.dto.AssignRole;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Page;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Privilege;
+import com.springsecurity.rbac.springsecurityrbac.mapper.PageMapper;
+import com.springsecurity.rbac.springsecurityrbac.mapper.PrivilegeMapper;
 import com.springsecurity.rbac.springsecurityrbac.service.PageService;
 import com.springsecurity.rbac.springsecurityrbac.service.PrivilegeService;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
@@ -59,17 +61,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         pageService.save(new Page(PAGE.PRODUCT));
 
         //prepare all privileges for root user
-        HashMap<PageDto, List<PrivilegeDto>> adminRole = new HashMap<>();
+        HashMap<PageDto, Collection<PrivilegeDto>> adminRole = new HashMap<>();
 
-        List<PrivilegeDto> prList = privilegeService.findAll()
-                .stream()
-                .map(privilege -> new PrivilegeDto(privilege.getName()))
-                .toList();
+        Collection<PrivilegeDto> prList = PrivilegeMapper.toPrivilegeDtos(privilegeService.findAll());
 
-        List<PageDto> pageList = pageService.findAll()
-                .stream()
-                .map(page -> new PageDto(page.getName()))
-                .toList();
+        Collection<PageDto> pageList = PageMapper.toPageDtos(pageService.findAll());
 
         for (PageDto pageDto : pageList) {
             adminRole.put(pageDto, prList);

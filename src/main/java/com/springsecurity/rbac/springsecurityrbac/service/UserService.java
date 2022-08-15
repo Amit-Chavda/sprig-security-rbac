@@ -53,6 +53,12 @@ public class UserService {
         return optionalUser.get();
     }
 
+    public UserDto deleteByEmail(String email) throws UsernameNotFoundException {
+        User user = findByEmail(email);
+        userRepository.delete(user);
+        return UserMapper.toUserDto(user);
+    }
+
 /*    public UserDto createUser(UserDto userDto) throws UserAlreadyExistException {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(), "User with " + userDto.getEmail() + " already exist!", LocalDateTime.now());
