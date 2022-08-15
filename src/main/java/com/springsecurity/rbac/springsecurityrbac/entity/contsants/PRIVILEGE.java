@@ -1,7 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.contsants;
 
 public class PRIVILEGE {
-    public static String CREATE = "CREATE";
     public static String READ = "READ";
     public static String WRITE = "WRITE";
     public static String UPDATE = "UPDATE";

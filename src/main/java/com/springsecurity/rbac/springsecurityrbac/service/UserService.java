@@ -31,8 +31,8 @@ public class UserService {
 
     public UserDto createUser(UserDto userDto) throws UserAlreadyExistException {
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(), "User with "
-                    + userDto.getEmail() + " already exist!", LocalDateTime.now());
+            throw new UserAlreadyExistException(UserAlreadyExistException.class.getName(),
+                    "User with " + userDto.getEmail() + " already exist!", LocalDateTime.now());
         }
         return UserMapper.toUserDto(save(UserMapper.toUser(userDto)));
 

@@ -80,21 +80,23 @@ public class RoleService {
         logger.info("New role with name {} is created!", role.getName());
         return RoleMapper.toRoleDto(roleRepository.save(role));
     }
-
     public UserDto assignRole(AssignRole assignRole) throws UsernameNotFoundException, RoleNotFoundException {
 
         List<Role> roles = assignRole.getRoleNames().stream().map(roleRepository::findByName).toList();
 
         User user = userService.findByEmail(assignRole.getUsername());
-        Collection<Role> roleCollection = new ArrayList<>(user.getRoles());
+        Collection<Role> roleCollection = new ArrayList<>();
 
-        //add new role only if user doesn't have that role already
-        roles.forEach(newRole -> {
-            if (!roleCollection.contains(newRole)) {
-                roleCollection.add(newRole);
-            }
-        });
-
+        //check if user has other roles
+        if (user.getRoles() != null) {
+            roleCollection.addAll(user.getRoles());
+            roles.forEach(newRole -> {
+                if (!roleCollection.contains(newRole)) {
+                    roleCollection.add(newRole);
+                }
+            });
+        }
+        roleCollection.addAll(roles);
         user.setRoles(roleCollection);
         logger.info("New role(s) {} assigned to user {}", assignRole.getRoleNames(), assignRole.getUsername());
         return UserMapper.toUserDto(userService.save(user));

@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
 public class RoleMapper {
 
     public static RoleDto toRoleDto(Role role) {
-
+        if (role == null) {
+            return null;
+        }
         List<PagesPrivileges> pagesPrivilegesList =
                 role.getRolePagesPrivileges()
                         .stream()
@@ -43,13 +45,17 @@ public class RoleMapper {
     }
 
     public static Collection<RoleDto> toRoleDtos(Collection<Role> all) {
+        if (all == null) {
+            return null;
+        }
         return all.stream().map(RoleMapper::toRoleDto).toList();
     }
 
 
     public static Role toRole(RoleDto roleDto) {
-
-
+        if (roleDto == null) {
+            return null;
+        }
         Collection<PagesPrivileges> pagesPrivilegesList = roleDto.getPagePrivilegeMap()
                 .entrySet()
                 .stream()
@@ -77,6 +83,9 @@ public class RoleMapper {
 
 
     public static Collection<Role> toRoles(Collection<RoleDto> roles) {
+        if (roles == null) {
+            return null;
+        }
         return roles.stream().map(RoleMapper::toRole).toList();
     }
 }

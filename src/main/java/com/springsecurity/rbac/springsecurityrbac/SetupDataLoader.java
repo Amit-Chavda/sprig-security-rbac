@@ -48,16 +48,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         //setup default privileges
-        privilegeService.save(new Privilege(PRIVILEGE.CREATE));
         privilegeService.save(new Privilege(PRIVILEGE.READ));
         privilegeService.save(new Privilege(PRIVILEGE.WRITE));
         privilegeService.save(new Privilege(PRIVILEGE.UPDATE));
         privilegeService.save(new Privilege(PRIVILEGE.DELETE));
 
         //setup default pages
-        pageService.save(new Page(PAGE.HOME));
-        pageService.save(new Page(PAGE.SUMMARY));
-        pageService.save(new Page(PAGE.ORDER));
+        pageService.save(new Page(PAGE.USER));
+        pageService.save(new Page(PAGE.ROLE));
         pageService.save(new Page(PAGE.PRODUCT));
 
         //prepare all privileges for root user
@@ -73,36 +71,24 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         RoleDto adminRoleDto = new RoleDto("ADMIN", adminRole);
 
-        try {
-            roleService.createRole(adminRoleDto);
-        } catch (Exception e) {
-            logger.info(e.toString());
-        }
+
+        roleService.createRole(adminRoleDto);
 
 
         UserDto admin = new UserDto();
-        try {
-            //setup default root admin
 
-            admin.setFirstName("Admin");
-            admin.setLastName("Admin");
-            admin.setPassword(new BCryptPasswordEncoder().encode("admin"));
-            admin.setEmail("admin@test.com");
-            admin.setRoles(List.of(adminRoleDto));
-            admin.setEnabled(true);
-            userService.createUser(admin);
+        //setup default root admin
+        admin.setFirstName("Admin");
+        admin.setLastName("Admin");
+        admin.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        admin.setEmail("admin@test.com");
+        admin.setRoles(List.of(adminRoleDto));
+        admin.setEnabled(true);
+        userService.createUser(admin);
 
-        } catch (Exception e) {
-            logger.info(e.toString());
-        }
-        try {
-            AssignRole assignRole = new AssignRole();
-            assignRole.setUsername(admin.getEmail());
-            assignRole.setRoleNames(new ArrayList<>(Collections.singleton(adminRoleDto.getName())));
-            roleService.assignRole(assignRole);
-        } catch (Exception e) {
-            logger.info(e.toString());
-        }
-
+        AssignRole assignRole = new AssignRole();
+        assignRole.setUsername(admin.getEmail());
+        assignRole.setRoleNames(new ArrayList<>(Collections.singleton(adminRoleDto.getName())));
+        roleService.assignRole(assignRole);
     }
 }

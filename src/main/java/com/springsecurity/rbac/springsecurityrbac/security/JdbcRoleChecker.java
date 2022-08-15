@@ -36,7 +36,8 @@ public class JdbcRoleChecker implements RoleChecker {
                 logger.warn("User {} performed {} on {} ", authentication.getName(), request.getMethod(), pageCode);
                 return true;
             }
-            logger.warn("User with id {} tried to perform unauthorized activity {} on page {}", authentication.getName(), request.getMethod(), pageCode);
+            logger.warn("User with id {} tried to perform unauthorized activity {} on page {}",
+                    authentication.getName(), request.getMethod(), pageCode);
         }
         logger.warn("User with id {} tried to access unauthorized page {}", authentication.getName(), pageCode);
         return false;
@@ -46,7 +47,7 @@ public class JdbcRoleChecker implements RoleChecker {
         String privilege = switch (method.toUpperCase()) {
             case "GET" -> PRIVILEGE.READ;
             case "PUT" -> PRIVILEGE.UPDATE;
-            case "POST" -> PRIVILEGE.CREATE;
+            case "POST" -> PRIVILEGE.WRITE;
             case "DELETE" -> PRIVILEGE.DELETE;
             default -> null;
         };
@@ -59,11 +60,6 @@ public class JdbcRoleChecker implements RoleChecker {
         return false;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        //Assert.notNull(supplier.get(), "function must not be null");
-    }
-
     boolean hasAccessToPage(Collection<? extends GrantedAuthority> authorities, String pageCode) {
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().split("\\.")[0].equals(pageCode)) {
@@ -71,5 +67,10 @@ public class JdbcRoleChecker implements RoleChecker {
             }
         }
         return false;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        //Assert.notNull(supplier.get(), "function must not be null");
     }
 }
