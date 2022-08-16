@@ -43,7 +43,8 @@ public class JwtUserController {
         UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
 
         JwtUserResponse jwtUserResponse = new JwtUserResponse(
-                jwtUtil.generateToken(user, new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)),
+                //1000 * 60 = 1 minute
+                jwtUtil.generateToken(user, new Date(System.currentTimeMillis() + 1000 * 60 * 10)),
                 LocalDateTime.now().plusMinutes(10)
         );
 
