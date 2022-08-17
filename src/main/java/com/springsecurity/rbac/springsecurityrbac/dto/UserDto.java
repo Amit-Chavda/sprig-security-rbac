@@ -18,6 +18,7 @@ public class UserDto {
     private String email;
     private String password;
     private boolean enabled;
+    private boolean specialPrivileges=false;
     private Collection<RoleDto> roles;
 
 }

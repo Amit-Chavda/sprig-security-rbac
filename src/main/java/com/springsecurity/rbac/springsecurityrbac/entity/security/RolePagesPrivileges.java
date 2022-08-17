@@ -1,19 +1,12 @@
 package com.springsecurity.rbac.springsecurityrbac.entity.security;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
 public class RolePagesPrivileges {
 
     @Id
@@ -28,6 +21,6 @@ public class RolePagesPrivileges {
     @JoinColumn(name = "pages_privileges_id", referencedColumnName = "id")
     private PagesPrivileges pagesPrivileges;
 
-    @ManyToMany(mappedBy = "rolePagesPrivileges", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    private Collection<User> users;
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private User user;
 }

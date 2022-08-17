@@ -7,17 +7,19 @@ import com.springsecurity.rbac.springsecurityrbac.exception.RoleAlreadyExistExce
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleNotFoundException;
 import com.springsecurity.rbac.springsecurityrbac.mapper.PageMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.PrivilegeMapper;
-import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
 import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
-import com.springsecurity.rbac.springsecurityrbac.util.Console;
+import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoleService {
@@ -137,10 +139,13 @@ public class RoleService {
         return UserMapper.toUserDto(userService.save(user));
     }
 
-    public ExtendRole extendRole(ExtendRole extendRole) throws UsernameNotFoundException{
+    public ExtendRole extendRole(ExtendRole extendRole) throws UsernameNotFoundException {
+
         User user = userService.findByEmail(extendRole.getUsername());
-        Console.println("Extend called..",RoleService.class);
+
         Collection<PagesPrivilegesDto> pagesPrivilegesDtos = extendRole.getPagesPrivilegesDtos();
+
+
         Collection<RolePagesPrivileges> rolePagesPrivilegesList = new ArrayList<>();
         pagesPrivilegesDtos.forEach(pagesPrivilegesDto -> {
 
@@ -152,9 +157,11 @@ public class RoleService {
             RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
             rolePagesPrivileges.setPagesPrivileges(pagesPrivilegesService.findByName(pagesPrivileges1));
             rolePagesPrivilegesList.add(rolePagesPrivilegesService.saveDirect(rolePagesPrivileges));
+            rolePagesPrivileges.setUser(user);
         });
 
         user.setRolePagesPrivileges(rolePagesPrivilegesList);
+        user.setSpecialPrivileges(true);
         userService.save(user);
         return extendRole;
     }

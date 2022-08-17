@@ -52,7 +52,7 @@ public class JdbcRoleChecker implements RoleChecker {
             case "DELETE" -> PRIVILEGE.DELETE;
             default -> null;
         };
-        Console.println(authorities + method, JdbcRoleChecker.class);
+
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().split("\\.")[1].equals(privilege)) {
                 return true;

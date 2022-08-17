@@ -28,6 +28,7 @@ public class User {
     private String email;
     private String password;
     private boolean enabled;
+    private boolean specialPrivileges=false;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -38,7 +39,7 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     @LazyCollection(LazyCollectionOption.FALSE)
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 }
