@@ -1,7 +1,11 @@
 package com.springsecurity.rbac.springsecurityrbac.mapper;
 
+import com.springsecurity.rbac.springsecurityrbac.dto.PagesPrivilegesDto;
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.PagesPrivileges;
+
+import java.util.Collection;
 
 public class UserMapper {
     public static UserDto toUserDto(User user) {
@@ -12,6 +16,19 @@ public class UserMapper {
         userDto.setLastName(user.getLastName());
         userDto.setRoles(RoleMapper.toRoleDtos(user.getRoles()));
         userDto.setSpecialPrivileges(user.isSpecialPrivileges());
+        if (user.isSpecialPrivileges()) {
+            Collection<PagesPrivilegesDto> pagesPrivilegesDtos =
+                    user.getRolePagesPrivileges().stream()
+                            .map(rolePagesPrivileges -> {
+                                PagesPrivileges pagesPrivileges = rolePagesPrivileges.getPagesPrivileges();
+                                PagesPrivilegesDto pagesPrivilegesDto = new PagesPrivilegesDto();
+                                pagesPrivilegesDto.setPageDto(PageMapper.toPageDto(pagesPrivileges.getPage()));
+                                pagesPrivilegesDto.setPrivilegeDto(PrivilegeMapper.toPrivilegeDto(pagesPrivileges.getPrivilege()));
+                                return pagesPrivilegesDto;
+                            }).toList();
+
+            userDto.setSpecialPagesPrivileges(pagesPrivilegesDtos);
+        }
         return userDto;
     }
 
@@ -26,4 +43,15 @@ public class UserMapper {
         return user;
     }
 
+    public static Collection<UserDto> toUserDtos(Collection<User> users) {
+        return users.stream()
+                .map(UserMapper::toUserDto)
+                .toList();
+    }
+
+    public static Collection<User> toUsers(Collection<UserDto> userDtoss) {
+        return userDtoss.stream()
+                .map(UserMapper::toUser)
+                .toList();
+    }
 }

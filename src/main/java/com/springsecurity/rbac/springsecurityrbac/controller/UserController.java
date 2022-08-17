@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/user")
@@ -33,7 +33,7 @@ public class UserController {
 
     @GetMapping("/findAll")
     @PreAuthorize(value = "@roleChecker.check(authentication)")
-    public List<UserDto> getAllUsers() {
+    public Collection<UserDto> getAllUsers() {
         return userService.findAll();
     }
 

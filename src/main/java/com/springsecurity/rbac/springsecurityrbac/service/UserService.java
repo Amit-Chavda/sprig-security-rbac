@@ -3,17 +3,16 @@ package com.springsecurity.rbac.springsecurityrbac.service;
 import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.exception.UserAlreadyExistException;
-import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
+import com.springsecurity.rbac.springsecurityrbac.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -44,11 +43,8 @@ public class UserService {
 
     }
 
-    public List<UserDto> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(UserMapper::toUserDto)
-                .toList();
+    public Collection<UserDto> findAll() {
+        return UserMapper.toUserDtos(userRepository.findAll());
     }
 
     public User findByEmail(String username) throws UsernameNotFoundException {
