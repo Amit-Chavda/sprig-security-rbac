@@ -39,7 +39,7 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
     @LazyCollection(LazyCollectionOption.FALSE)
     private Collection<RolePagesPrivileges> rolePagesPrivileges;
 }

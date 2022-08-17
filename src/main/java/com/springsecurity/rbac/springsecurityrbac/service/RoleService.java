@@ -10,6 +10,7 @@ import com.springsecurity.rbac.springsecurityrbac.mapper.PrivilegeMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
 import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
+import com.springsecurity.rbac.springsecurityrbac.util.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -142,6 +143,9 @@ public class RoleService {
     public ExtendRole extendRole(ExtendRole extendRole) throws UsernameNotFoundException {
 
         User user = userService.findByEmail(extendRole.getUsername());
+        if (user.getRoles() == null) {
+            throw new UsernameNotFoundException("User does not have role(s) related to this privileges!");
+        }
 
         Collection<PagesPrivilegesDto> pagesPrivilegesDtos = extendRole.getPagesPrivilegesDtos();
 
@@ -164,5 +168,45 @@ public class RoleService {
         user.setSpecialPrivileges(true);
         userService.save(user);
         return extendRole;
+    }
+
+    public RevokeExtendPrivilege revokeExtendedPrivileges(RevokeExtendPrivilege revokeExtendPrivilege) throws UsernameNotFoundException {
+        User user = userService.findByEmail(revokeExtendPrivilege.getUsername());
+
+        Collection<RolePagesPrivileges> newRolePagesPrivileges = new ArrayList<>();
+        Collection<RolePagesPrivileges> removableRolePagesPrivileges = new ArrayList<>();
+
+        user.getRolePagesPrivileges()
+                .forEach(rolePagesPrivileges -> {
+                    String pageName = rolePagesPrivileges.getPagesPrivileges().getPage().getName();
+                    String privilegeName = rolePagesPrivileges.getPagesPrivileges().getPrivilege().getName();
+
+                    revokeExtendPrivilege.getSpecialPrivilegesMap()
+                            .forEach((key, value) -> {
+                                if (!key.getName().equals(pageName)) {
+                                    value.forEach(privilegeDto -> {
+                                        if (!privilegeDto.getName().equals(privilegeName)) {
+                                            //collect new mappings
+                                            newRolePagesPrivileges.add(rolePagesPrivileges);
+                                        }
+                                    });
+                                } else {
+                                    //collect unused mappings
+                                    rolePagesPrivileges.setPagesPrivileges(null);
+                                    removableRolePagesPrivileges.add(rolePagesPrivileges);
+                                }
+                            });
+
+                });
+
+        user.setRolePagesPrivileges(newRolePagesPrivileges);
+        user.setSpecialPrivileges(true);
+        userService.save(user);
+
+        //delete unused mappings
+        removableRolePagesPrivileges.forEach(rolePagesPrivileges -> {
+            rolePagesPrivilegesService.deleteById(rolePagesPrivileges.getId());
+        });
+        return revokeExtendPrivilege;
     }
 }

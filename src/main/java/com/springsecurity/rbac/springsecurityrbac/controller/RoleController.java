@@ -71,6 +71,16 @@ public class RoleController {
         }
     }
 
+    @PutMapping("/revokeExtendedPrivileges")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
+    public RevokeExtendPrivilege revokeExtendedPrivileges(@RequestBody RevokeExtendPrivilege revokeExtendPrivilege) {
+        try {
+            return roleService.revokeExtendedPrivileges(revokeExtendPrivilege);
+        } catch (UsernameNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
     @PutMapping("/revokeRole")
     @PreAuthorize(value = "@roleChecker.check(authentication)")
     public UserDto revokeRole(@RequestBody RevokeRole revokeRole) {

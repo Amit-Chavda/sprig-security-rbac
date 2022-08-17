@@ -4,6 +4,7 @@ import com.springsecurity.rbac.springsecurityrbac.entity.security.RolePagesPrivi
 import com.springsecurity.rbac.springsecurityrbac.repository.RolePagesPrivilegesRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -33,5 +34,10 @@ public class RolePagesPrivilegesService {
 
     public RolePagesPrivileges saveDirect(RolePagesPrivileges rolePagesPrivileges) {
         return rolePagesPrivilegesRepository.save(rolePagesPrivileges);
+    }
+
+    @Transactional
+    public void deleteById(long id) {
+        rolePagesPrivilegesRepository.deleteById(id);
     }
 }
