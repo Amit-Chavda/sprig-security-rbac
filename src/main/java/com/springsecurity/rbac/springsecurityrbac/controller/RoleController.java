@@ -1,9 +1,6 @@
 package com.springsecurity.rbac.springsecurityrbac.controller;
 
-import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
-import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
-import com.springsecurity.rbac.springsecurityrbac.dto.AssignRole;
-import com.springsecurity.rbac.springsecurityrbac.dto.RevokeRole;
+import com.springsecurity.rbac.springsecurityrbac.dto.*;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleAlreadyExistException;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleNotFoundException;
 import com.springsecurity.rbac.springsecurityrbac.service.RoleService;
@@ -59,6 +56,17 @@ public class RoleController {
         try {
             return roleService.assignRole(assignRole);
         } catch (RoleNotFoundException | UsernameNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PostMapping("/extendRole")
+    @PreAuthorize(value = "@roleChecker.check(authentication)")
+    public ExtendRole extendRole(@RequestBody ExtendRole extendRole) {
+
+        try {
+            return roleService.extendRole(extendRole);
+        } catch (UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

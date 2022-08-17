@@ -28,27 +28,31 @@ public class UserDetailsImpl implements UserDetails {
         return RoleMapper.toRoleDtos(user.getRoles())
                 .stream()
                 .map(roleDto -> {
-                    return roleDto.getPagePrivilegeMap()
-                            .entrySet()
-                            .stream()
-                            .map(pageDtoListEntry -> {
+                    Collection<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>(
 
-                                List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+                            roleDto.getPagePrivilegeMap()
+                                    .entrySet()
+                                    .stream()
+                                    .map(pageDtoListEntry -> {
 
-                                for (PrivilegeDto privilegeDto : pageDtoListEntry.getValue()) {
-                                    grantedAuthorities.add(new SimpleGrantedAuthority(
-                                            pageDtoListEntry.getKey().getName() + "." + privilegeDto.getName()
-                                    ));
-                                }
-                                return grantedAuthorities;
-                            }).toList()
-                            .stream()
-                            .flatMap(List::stream)
-                            .toList();
-                    //simpleGrantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleDto.getName()));
+                                        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+
+                                        for (PrivilegeDto privilegeDto : pageDtoListEntry.getValue()) {
+                                            grantedAuthorities.add(new SimpleGrantedAuthority(
+                                                    pageDtoListEntry.getKey().getName() + "." + privilegeDto.getName()
+                                            ));
+                                        }
+                                        return grantedAuthorities;
+                                    }).toList()
+                                    .stream()
+                                    .flatMap(List::stream)
+                                    .toList()
+                    );
+                    simpleGrantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleDto.getName()));
+                    return simpleGrantedAuthorities;
                 }).toList()
                 .stream()
-                .flatMap(List::stream)
+                .flatMap(Collection::stream)
                 .toList();
     }
 

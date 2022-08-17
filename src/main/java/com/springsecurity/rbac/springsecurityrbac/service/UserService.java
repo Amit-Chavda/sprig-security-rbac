@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,12 @@ public class UserService {
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User save(User user) {
@@ -36,7 +39,7 @@ public class UserService {
                     "User with " + userDto.getEmail() + " already exist!", LocalDateTime.now());
         }
         User user = UserMapper.toUser(userDto);
-        user.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return UserMapper.toUserDto(save(user));
 
     }

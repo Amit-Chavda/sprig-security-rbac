@@ -26,4 +26,9 @@ public class PagesPrivilegesService {
         );
         return pagesPrivilegesOptional.orElseGet(() -> pagesPrivilegesRepository.save(pagesPrivileges));
     }
+
+    public PagesPrivileges findByName(PagesPrivileges pagesPrivileges) {
+        Optional<PagesPrivileges> pagesPrivilegesOptional = pagesPrivilegesRepository.existByName(pagesPrivileges.getPrivilege().getName(), pagesPrivileges.getPage().getName());
+        return pagesPrivilegesOptional.orElseGet(null);
+    }
 }

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -36,11 +37,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private RoleService roleService;
 
-    public SetupDataLoader(PrivilegeService privilegeService, UserService userService, PageService pageService, RoleService roleService) {
+    private PasswordEncoder passwordEncoder;
+
+    public SetupDataLoader(PrivilegeService privilegeService, UserService userService, PageService pageService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.privilegeService = privilegeService;
         this.userService = userService;
         this.pageService = pageService;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         //setup default root admin
         admin.setFirstName("Admin");
         admin.setLastName("Admin");
-        admin.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        admin.setPassword("admin");
         admin.setEmail("admin@test.com");
         admin.setRoles(List.of(adminRoleDto));
         admin.setEnabled(true);

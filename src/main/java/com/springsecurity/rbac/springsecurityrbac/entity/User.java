@@ -1,10 +1,13 @@
 package com.springsecurity.rbac.springsecurityrbac.entity;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.security.Role;
+import com.springsecurity.rbac.springsecurityrbac.entity.security.RolePagesPrivileges;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -35,5 +38,8 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
+    @OneToMany(cascade = {CascadeType.ALL})
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private Collection<RolePagesPrivileges> rolePagesPrivileges;
 }
 

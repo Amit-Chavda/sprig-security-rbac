@@ -1,6 +1,7 @@
 package com.springsecurity.rbac.springsecurityrbac.security;
 
 import com.springsecurity.rbac.springsecurityrbac.entity.contsants.PRIVILEGE;
+import com.springsecurity.rbac.springsecurityrbac.util.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -51,7 +52,7 @@ public class JdbcRoleChecker implements RoleChecker {
             case "DELETE" -> PRIVILEGE.DELETE;
             default -> null;
         };
-
+        Console.println(authorities + method, JdbcRoleChecker.class);
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().split("\\.")[1].equals(privilege)) {
                 return true;

@@ -1,16 +1,16 @@
 package com.springsecurity.rbac.springsecurityrbac.service;
 
-import com.springsecurity.rbac.springsecurityrbac.dto.AssignRole;
-import com.springsecurity.rbac.springsecurityrbac.dto.RevokeRole;
-import com.springsecurity.rbac.springsecurityrbac.dto.RoleDto;
-import com.springsecurity.rbac.springsecurityrbac.dto.UserDto;
+import com.springsecurity.rbac.springsecurityrbac.dto.*;
 import com.springsecurity.rbac.springsecurityrbac.entity.User;
 import com.springsecurity.rbac.springsecurityrbac.entity.security.*;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleAlreadyExistException;
 import com.springsecurity.rbac.springsecurityrbac.exception.RoleNotFoundException;
+import com.springsecurity.rbac.springsecurityrbac.mapper.PageMapper;
+import com.springsecurity.rbac.springsecurityrbac.mapper.PrivilegeMapper;
 import com.springsecurity.rbac.springsecurityrbac.repository.RoleRepository;
 import com.springsecurity.rbac.springsecurityrbac.mapper.RoleMapper;
 import com.springsecurity.rbac.springsecurityrbac.mapper.UserMapper;
+import com.springsecurity.rbac.springsecurityrbac.util.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -135,5 +135,27 @@ public class RoleService {
         user.setRoles(roleCollection);
         logger.info("Role(s) {} revoked from user {}", revokeRole.getRoleNames(), revokeRole.getUsername());
         return UserMapper.toUserDto(userService.save(user));
+    }
+
+    public ExtendRole extendRole(ExtendRole extendRole) throws UsernameNotFoundException{
+        User user = userService.findByEmail(extendRole.getUsername());
+        Console.println("Extend called..",RoleService.class);
+        Collection<PagesPrivilegesDto> pagesPrivilegesDtos = extendRole.getPagesPrivilegesDtos();
+        Collection<RolePagesPrivileges> rolePagesPrivilegesList = new ArrayList<>();
+        pagesPrivilegesDtos.forEach(pagesPrivilegesDto -> {
+
+            PagesPrivileges pagesPrivileges1 = new PagesPrivileges(
+                    PageMapper.toPage(pagesPrivilegesDto.getPageDto()),
+                    PrivilegeMapper.toPrivilege(pagesPrivilegesDto.getPrivilegeDto())
+            );
+
+            RolePagesPrivileges rolePagesPrivileges = new RolePagesPrivileges();
+            rolePagesPrivileges.setPagesPrivileges(pagesPrivilegesService.findByName(pagesPrivileges1));
+            rolePagesPrivilegesList.add(rolePagesPrivilegesService.saveDirect(rolePagesPrivileges));
+        });
+
+        user.setRolePagesPrivileges(rolePagesPrivilegesList);
+        userService.save(user);
+        return extendRole;
     }
 }

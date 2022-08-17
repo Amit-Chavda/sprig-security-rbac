@@ -30,4 +30,8 @@ public class RolePagesPrivilegesService {
     public void delete(RolePagesPrivileges rolePagesPrivileges) {
         rolePagesPrivilegesRepository.delete(rolePagesPrivileges);
     }
+
+    public RolePagesPrivileges saveDirect(RolePagesPrivileges rolePagesPrivileges) {
+        return rolePagesPrivilegesRepository.save(rolePagesPrivileges);
+    }
 }
